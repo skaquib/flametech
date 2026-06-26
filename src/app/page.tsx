@@ -42,21 +42,19 @@ export default function Home() {
       },
     });
 
-    // 3D rotation and scale dynamic shift
+    // Scale and horizontal drift dynamic shift
     tl.to(realBurnerRef.current, {
-      rotateY: 45,
-      rotateX: -12,
-      scale: 1.1,
-      x: 20,
+      scale: 1.12,
+      x: 25,
       duration: 3,
     }, 0);
 
-    // Cyan holographic scan diagnostics drift left
+    // Cyan holographic scan diagnostics drift left flatly and fade in
     tl.to(ghostBurnerRef.current, {
-      x: -40,
-      y: -15,
-      rotateY: 15,
-      scale: 1.05,
+      x: -35,
+      y: -10,
+      scale: 1.08,
+      opacity: 0.6,
       duration: 3,
     }, 0);
 
@@ -203,7 +201,7 @@ export default function Home() {
       {/* Interactive Blueprint Hero Track */}
       <section 
         ref={containerRef} 
-        className="relative w-full overflow-visible bg-slate-50 dark:bg-[#060b13] text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/5 select-none"
+        className="relative w-full overflow-visible bg-slate-50 dark:bg-[#060b13] text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/5 select-none lg:h-[180vh] h-auto"
       >
         {/* Sticky Viewport */}
         <div className="relative lg:sticky lg:top-0 lg:h-screen h-auto w-full flex flex-col justify-between overflow-hidden engineering-grid pt-24 pb-8 z-20">
@@ -244,7 +242,7 @@ export default function Home() {
                   Combustion.
                 </span>
               </h1>
-              <p className="text-slate-650 dark:text-slate-400 text-xs sm:text-sm max-w-sm leading-relaxed">
+              <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm max-w-sm leading-relaxed">
                 Introducing the FT Series. Modular high-efficiency burners engineered for heavy-industry process kilns and steam boilers. Designed to achieve up to 15% fuel reduction.
               </p>
               
@@ -260,7 +258,7 @@ export default function Home() {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Link
                     href="/services/amc"
-                    className="inline-block px-5 py-3 bg-slate-200 dark:bg-slate-900 border border-slate-350 dark:border-slate-800 hover:bg-slate-300 dark:hover:bg-slate-800 text-slate-800 dark:text-white font-bold rounded text-xs tracking-wider uppercase transition-all"
+                    className="inline-block px-5 py-3 bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 hover:bg-slate-300 dark:hover:bg-slate-800 text-slate-800 dark:text-white font-bold rounded text-xs tracking-wider uppercase transition-all"
                   >
                     SLA Service
                   </Link>
@@ -286,7 +284,7 @@ export default function Home() {
 
             {/* Center Column: Interactive Disassembly & Hotspots */}
             <div className="lg:col-span-5 flex justify-center items-center relative py-12 lg:py-0">
-              <div className="relative w-full h-[320px] flex items-center justify-center perspective-2000 preserve-3d">
+              <div className="relative w-full h-[320px] flex items-center justify-center">
                 {/* Diagnostic cyan scanning ghost (slides left) */}
                 <div 
                   ref={ghostBurnerRef}
@@ -356,7 +354,7 @@ export default function Home() {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-orange border border-white"></span>
                   <div className="absolute bottom-6 right-2 bg-white/95 dark:bg-slate-950/95 border border-slate-200 dark:border-white/10 text-left p-3 rounded-lg shadow-2xl backdrop-blur-md w-56 transition-all scale-95 group-hover:scale-100 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
                     <div className="text-[9px] font-bold text-brand-orange uppercase tracking-wider">Spark Electrode</div>
-                    <div className="text-[11px] text-slate-650 dark:text-slate-300 font-medium mt-1 leading-snug">Glazed Alumina ceramic spark igniting fuel reliably at up to 1300°C.</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-300 font-medium mt-1 leading-snug">Glazed Alumina ceramic spark igniting fuel reliably at up to 1300°C.</div>
                   </div>
                 </div>
 
@@ -369,7 +367,7 @@ export default function Home() {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-orange border border-white"></span>
                   <div className="absolute top-6 left-2 bg-white/95 dark:bg-slate-950/95 border border-slate-200 dark:border-white/10 text-left p-3 rounded-lg shadow-2xl backdrop-blur-md w-56 transition-all scale-95 group-hover:scale-100 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
                     <div className="text-[9px] font-bold text-brand-orange uppercase tracking-wider">1400°C Combustion Head</div>
-                    <div className="text-[11px] text-slate-650 dark:text-slate-300 font-medium mt-1 leading-snug">Custom gas/air mixing head creating homogeneous flame configurations.</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-300 font-medium mt-1 leading-snug">Custom gas/air mixing head creating homogeneous flame configurations.</div>
                   </div>
                 </div>
 
@@ -382,7 +380,7 @@ export default function Home() {
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-orange border border-white"></span>
                   <div className="absolute top-6 left-2 bg-white/95 dark:bg-slate-950/95 border border-slate-200 dark:border-white/10 text-left p-3 rounded-lg shadow-2xl backdrop-blur-md w-56 transition-all scale-95 group-hover:scale-100 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto">
                     <div className="text-[9px] font-bold text-brand-orange uppercase tracking-wider">Solenoid Safety Block</div>
-                    <div className="text-[11px] text-slate-655 dark:text-slate-300 font-medium mt-1 leading-snug">Class A safety valves with instantaneous emergency shutoff under 1s.</div>
+                    <div className="text-[11px] text-slate-500 dark:text-slate-300 font-medium mt-1 leading-snug">Class A safety valves with instantaneous emergency shutoff under 1s.</div>
                   </div>
                 </div>
               </div>
@@ -404,7 +402,7 @@ export default function Home() {
                       key={m.id}
                       onClick={() => setSelectedBurner(m.id)}
                       className={`relative py-1.5 px-1 text-[9px] font-extrabold rounded uppercase transition-colors duration-200 cursor-pointer z-10 ${
-                        selectedBurner === m.id ? "text-slate-950 dark:text-white" : "text-slate-500 hover:text-slate-850 dark:hover:text-slate-350"
+                        selectedBurner === m.id ? "text-slate-950 dark:text-white" : "text-slate-500 hover:text-slate-800 dark:hover:text-slate-300"
                       }`}
                     >
                       <span className="relative z-10">{m.name}</span>
@@ -542,7 +540,7 @@ export default function Home() {
                   {benefit.icon}
                 </div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white">{benefit.title}</h4>
-                <p className="text-slate-650 dark:text-slate-400 text-sm leading-relaxed">{benefit.description}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{benefit.description}</p>
               </div>
             ))}
           </div>

@@ -199,7 +199,7 @@ export default async function ProductsPage() {
             <span>Industrial Spares & Equipment</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">FlameTech Catalog</h1>
-          <p className="text-slate-650 dark:text-slate-400 text-sm max-w-3xl">
+          <p className="text-slate-500 dark:text-slate-400 text-sm max-w-3xl">
             Browse our line-up of industrial gas burners, control boxes, valves, and electrodes. Equipments are quote-only; spares can be purchased online.
           </p>
         </div>

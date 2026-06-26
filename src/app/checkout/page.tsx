@@ -178,7 +178,7 @@ export default function CheckoutPage() {
         </div>
 
         {items.length === 0 ? (
-          <div className="text-center py-10 text-slate-650 dark:text-slate-400">
+          <div className="text-center py-10 text-slate-500 dark:text-slate-400">
             No items to checkout. Return to <Link href="/products" className="text-brand-orange">Catalog</Link>
           </div>
         ) : (
@@ -195,7 +195,7 @@ export default function CheckoutPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Contact name */}
                 <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Full Name *</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Full Name *</label>
                   <input
                     type="text"
                     required
@@ -207,7 +207,7 @@ export default function CheckoutPage() {
                 </div>
                 {/* Contact phone */}
                 <div className="space-y-1.5 col-span-2 sm:col-span-1">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Contact Phone *</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Contact Phone *</label>
                   <input
                     type="tel"
                     required
@@ -219,7 +219,7 @@ export default function CheckoutPage() {
                 </div>
                 {/* Contact email */}
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Email Address *</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Email Address *</label>
                   <input
                     type="email"
                     required
@@ -232,7 +232,7 @@ export default function CheckoutPage() {
 
                 {/* Company Name & GSTIN */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Company Name (B2B Billing)</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Company Name (B2B Billing)</label>
                   <input
                     type="text"
                     value={form.company}
@@ -242,7 +242,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">B2B GSTIN (Optional)</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">B2B GSTIN (Optional)</label>
                   <input
                     type="text"
                     value={form.gstin}
@@ -254,7 +254,7 @@ export default function CheckoutPage() {
 
                 {/* Line 1 */}
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Address Line 1 *</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Address Line 1 *</label>
                   <input
                     type="text"
                     required
@@ -266,7 +266,7 @@ export default function CheckoutPage() {
                 </div>
                 {/* Line 2 */}
                 <div className="space-y-1.5 col-span-2">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Address Line 2 (Optional)</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Address Line 2 (Optional)</label>
                   <input
                     type="text"
                     value={form.line2}
@@ -278,7 +278,7 @@ export default function CheckoutPage() {
 
                 {/* City */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">City *</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">City *</label>
                   <input
                     type="text"
                     required
@@ -290,7 +290,7 @@ export default function CheckoutPage() {
                 </div>
                 {/* State */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">State *</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">State *</label>
                   <input
                     type="text"
                     required
@@ -302,7 +302,7 @@ export default function CheckoutPage() {
                 </div>
                 {/* Pincode */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Postal Pincode *</label>
+                  <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Postal Pincode *</label>
                   <input
                     type="text"
                     required
@@ -349,7 +349,7 @@ export default function CheckoutPage() {
                       id="mock-payment"
                       checked={useMockPayment}
                       onChange={(e) => setUseMockPayment(e.target.checked)}
-                      className="rounded border-slate-350 dark:border-slate-800 bg-slate-50 dark:bg-[#060b13] text-brand-orange focus:ring-brand-orange"
+                      className="rounded border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-[#060b13] text-brand-orange focus:ring-brand-orange"
                     />
                     <label htmlFor="mock-payment" className="text-xs text-slate-700 dark:text-slate-300 font-semibold cursor-pointer">
                       Simulate payment success (Mock)

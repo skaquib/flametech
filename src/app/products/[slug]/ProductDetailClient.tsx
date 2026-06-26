@@ -148,7 +148,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           {product.specs && product.specs.length > 0 ? (
             <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-brand-slate/40">
               <table className="w-full text-sm text-left">
-                <thead className="bg-slate-100 dark:bg-[#0a1128]/80 text-xs font-bold text-slate-650 dark:text-slate-400 border-b border-slate-200 dark:border-brand-slate/40">
+                <thead className="bg-slate-100 dark:bg-[#0a1128]/80 text-xs font-bold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-brand-slate/40">
                   <tr>
                     <th className="px-6 py-3.5">Parameter</th>
                     <th className="px-6 py-3.5">Value</th>
@@ -180,7 +180,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 e.preventDefault();
                 alert(`Downloading specifications sheet for ${product.name} (Simulated)`);
               }}
-              className="inline-flex items-center space-x-2 px-5 py-3 bg-slate-200 hover:bg-slate-300 border border-slate-300 text-slate-850 dark:bg-brand-slate dark:border-slate-700 dark:text-white dark:hover:bg-brand-slate/80 text-xs font-bold rounded-lg transition-all shadow-sm"
+              className="inline-flex items-center space-x-2 px-5 py-3 bg-slate-200 hover:bg-slate-300 border border-slate-300 text-slate-800 dark:bg-brand-slate dark:border-slate-700 dark:text-white dark:hover:bg-brand-slate/80 text-xs font-bold rounded-lg transition-all shadow-sm"
             >
               <FileText className="w-4 h-4 text-brand-orange" />
               <span>Download Technical PDF Datasheet</span>
@@ -206,7 +206,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 <div className="pt-4">
                   <button
                     onClick={() => setQuoteSubmitted(false)}
-                    className="px-4 py-2 border border-slate-350 dark:border-slate-700 rounded text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
+                    className="px-4 py-2 border border-slate-300 dark:border-slate-700 rounded text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white"
                   >
                     Submit another request
                   </button>
@@ -223,7 +223,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5 col-span-2">
-                    <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Full Name *</label>
+                    <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Full Name *</label>
                     <input
                       type="text"
                       required
@@ -234,7 +234,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Phone *</label>
+                    <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Phone *</label>
                     <input
                       type="tel"
                       required
@@ -245,7 +245,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Qty Required</label>
+                    <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Qty Required</label>
                     <input
                       type="number"
                       min="1"
@@ -325,18 +325,18 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
             {/* Quantity selector */}
             <div className="space-y-2">
-              <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider block">Select Quantity</label>
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider block">Select Quantity</label>
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => handleQtyChange(quantity - 1)}
-                  className="w-10 h-10 border border-slate-350 dark:border-slate-700 bg-slate-100 dark:bg-brand-dark rounded-md flex items-center justify-center font-bold text-slate-800 dark:text-white text-lg hover:border-slate-400 dark:hover:border-slate-500"
+                  className="w-10 h-10 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-brand-dark rounded-md flex items-center justify-center font-bold text-slate-800 dark:text-white text-lg hover:border-slate-400 dark:hover:border-slate-500"
                 >
                   -
                 </button>
                 <span className="w-12 text-center font-bold text-slate-900 dark:text-white text-base">{quantity}</span>
                 <button
                   onClick={() => handleQtyChange(quantity + 1)}
-                  className="w-10 h-10 border border-slate-350 dark:border-slate-700 bg-slate-100 dark:bg-brand-dark rounded-md flex items-center justify-center font-bold text-slate-800 dark:text-white text-lg hover:border-slate-400 dark:hover:border-slate-500"
+                  className="w-10 h-10 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-brand-dark rounded-md flex items-center justify-center font-bold text-slate-800 dark:text-white text-lg hover:border-slate-400 dark:hover:border-slate-500"
                 >
                   +
                 </button>
@@ -359,7 +359,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
               <Link
                 href="/cart"
-                className="block text-center w-full py-3.5 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-750 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:border-slate-450 dark:hover:border-slate-500 transition-all"
+                className="block text-center w-full py-3.5 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-slate-500 transition-all"
               >
                 View Shopping Cart
               </Link>

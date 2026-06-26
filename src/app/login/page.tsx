@@ -106,7 +106,7 @@ function CustomerLoginForm() {
       {/* Guidelines */}
       <div className="text-[10px] text-slate-500 dark:text-slate-400 text-center leading-normal border-t border-slate-200 dark:border-slate-800/60 pt-4 space-y-2">
         <div>
-          Demo Accounts: <span className="text-slate-900 dark:text-white font-bold">customer@gmail.com</span> / Password: <span className="text-slate-905 dark:text-white font-bold">Customer123!</span>
+          Demo Accounts: <span className="text-slate-900 dark:text-white font-bold">customer@gmail.com</span> / Password: <span className="text-slate-900 dark:text-white font-bold">Customer123!</span>
         </div>
         <div>
           Are you an administrator?{" "}

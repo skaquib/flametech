@@ -68,7 +68,7 @@ function LoginForm() {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4 text-left">
         <div className="space-y-1.5">
-          <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Email Address</label>
+          <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Email Address</label>
           <div className="relative">
             <input
               type="email"
@@ -83,7 +83,7 @@ function LoginForm() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-[10px] text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider">Password</label>
+          <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Password</label>
           <div className="relative">
             <input
               type="password"
@@ -124,7 +124,7 @@ export default function AdminLoginPage() {
       {/* Background decoration */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-brand-orange/10 rounded-full blur-[80px] pointer-events-none"></div>
       
-      <Suspense fallback={<div className="text-slate-650 dark:text-slate-400 text-sm">Loading login portal...</div>}>
+      <Suspense fallback={<div className="text-slate-500 dark:text-slate-400 text-sm">Loading login portal...</div>}>
         <LoginForm />
       </Suspense>
     </div>

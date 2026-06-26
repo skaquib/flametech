@@ -94,7 +94,7 @@ export default function ProductListClient({
                 placeholder="Item name, code..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-slate-55 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 pl-9 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-brand-orange focus:bg-white"
+                className="w-full bg-slate-50 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 pl-9 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-brand-orange focus:bg-white"
               />
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
             </div>
@@ -172,7 +172,7 @@ export default function ProductListClient({
                 <Link
                   key={p.id}
                   href={`/products/${p.slug}`}
-                  className="group bg-white dark:bg-[#0a1128]/40 border border-slate-200 dark:border-brand-slate/30 hover:border-slate-350 dark:hover:border-brand-slate rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full text-left relative"
+                  className="group bg-white dark:bg-[#0a1128]/40 border border-slate-200 dark:border-brand-slate/30 hover:border-slate-300 dark:hover:border-brand-slate rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full text-left relative"
                 >
                   {/* Card Image fallback design */}
                   <div className="aspect-[4/3] bg-slate-100 dark:bg-brand-navy relative overflow-hidden flex items-center justify-center border-b border-slate-200 dark:border-brand-slate/30">

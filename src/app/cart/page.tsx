@@ -70,7 +70,7 @@ export default function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             {/* Cart Items List */}
             <div className="lg:col-span-8 space-y-4">
-              <div className="flex justify-between items-center text-xs text-slate-550 dark:text-slate-400 font-bold uppercase tracking-wider pb-2 border-b border-slate-250 dark:border-slate-800">
+              <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider pb-2 border-b border-slate-200 dark:border-slate-800">
                 <span>Ordered Item</span>
                 <div className="flex space-x-24 pr-4">
                   <span>Quantity</span>
@@ -113,14 +113,14 @@ export default function CartPage() {
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="w-7 h-7 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-brand-dark rounded flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-905 dark:hover:text-white text-sm"
+                        className="w-7 h-7 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-brand-dark rounded flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm"
                       >
                         -
                       </button>
                       <span className="w-8 text-center text-slate-800 dark:text-white text-xs font-bold">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="w-7 h-7 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-brand-dark rounded flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-905 dark:hover:text-white text-sm"
+                        className="w-7 h-7 border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-brand-dark rounded flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm"
                       >
                         +
                       </button>
@@ -151,7 +151,7 @@ export default function CartPage() {
               <div className="pt-2 flex justify-start">
                 <button
                   onClick={clearCart}
-                  className="text-xs font-bold text-slate-550 hover:text-slate-700 dark:hover:text-slate-300 border border-slate-300 dark:border-slate-800 hover:border-slate-450 dark:hover:border-slate-700 px-3 py-1.5 rounded transition-all"
+                  className="text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border border-slate-300 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 px-3 py-1.5 rounded transition-all"
                 >
                   Clear Shopping Basket
                 </button>
@@ -165,7 +165,7 @@ export default function CartPage() {
                   Summary
                 </h3>
 
-                <div className="space-y-3.5 text-sm text-slate-650 dark:text-slate-400">
+                <div className="space-y-3.5 text-sm text-slate-500 dark:text-slate-400">
                   <div className="flex justify-between">
                     <span>Items Count</span>
                     <span className="text-slate-900 dark:text-white font-bold">{totalItems}</span>
