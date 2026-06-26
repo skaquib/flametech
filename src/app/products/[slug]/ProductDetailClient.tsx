@@ -136,6 +136,28 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Item Code: {product.itemCode}</p>
         </div>
 
+        {/* Product Image Showcase */}
+        <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center group shadow-md">
+          <img
+            src={`/images/${product.slug}.jpg`}
+            alt={product.name}
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+              if (fallback) fallback.style.display = 'flex';
+            }}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
+          />
+          {/* Fallback Icon */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none hidden">
+            {isEquipment ? (
+              <Flame className="w-16 h-16 text-brand-orange/20" />
+            ) : (
+              <Settings className="w-16 h-16 text-brand-teal/20" />
+            )}
+          </div>
+        </div>
+
         {/* Description */}
         <div className="space-y-3 bg-white dark:bg-[#0a1128]/30 border border-slate-200 dark:border-slate-900 rounded-xl p-6 shadow-sm">
           <h3 className="text-slate-900 dark:text-white font-bold text-sm">Product Overview</h3>

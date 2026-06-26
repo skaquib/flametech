@@ -11,6 +11,69 @@ export default function Home() {
   const [selectedBurner, setSelectedBurner] = useState("ft-03");
   const [systemTime, setSystemTime] = useState("");
 
+  // 360 Explorer state
+  const [explorerTab, setExplorerTab] = useState("ft-10");
+  const [rotationDegrees, setRotationDegrees] = useState(0);
+
+  const explorerProducts = [
+    {
+      id: "ft-10",
+      name: "FT-10 Gas Burner",
+      image: "/images/ft-10.jpg",
+      usage: "High-capacity steam boiler assemblies & powder coating drying ovens.",
+      usedBy: "Britannia Industries, local engineering plants, chemical facilities.",
+      specifications: [
+        { label: "Stoichiometry", value: "Optimal (Lambda 1.15)" },
+        { label: "Temp Limit", value: "1150°C Max Output" },
+        { label: "Gas Pressure", value: "25 - 60 mbar" },
+      ],
+      hotspots: [
+        { min: 0, max: 120, label: "Safety Block", desc: "Monitored automatic gas lock valve prevents back-pressure issues." },
+        { min: 121, max: 240, label: "Combustion Chamber", desc: "Symmetrical high-temperature insulation maintains heat profile." },
+        { min: 241, max: 360, label: "Direct Flame Core", desc: "Self-stabilizing gas nozzle produces uniform, clean combustion." }
+      ]
+    },
+    {
+      id: "ft-25",
+      name: "FT-25 Extreme Burner",
+      image: "/images/ft-25.jpg",
+      usage: "Heavy industrial metallurgy foundries, cement plants, and glass-melting kilns.",
+      usedBy: "Reliance Industries, steel manufacturing groups, ceramics plants.",
+      specifications: [
+        { label: "Stoichiometry", value: "Pre-mix Stoichiometric" },
+        { label: "Temp Limit", value: "1400°C Constant" },
+        { label: "Gas Pressure", value: "50 - 120 mbar" },
+      ],
+      hotspots: [
+        { min: 0, max: 120, label: "Safety Bypass Manifold", desc: "Dual shutoff block solenoid ensures immediate gas kill under 1s." },
+        { min: 121, max: 240, label: "Mixing Nozzle", desc: "Precision-drilled stainless head achieves uniform stoichiometry." },
+        { min: 241, max: 360, label: "UV Photocell Scanner", desc: "Continuous optical monitoring intercepts flame failure issues instantly." }
+      ]
+    },
+    {
+      id: "semi-auto-panel",
+      name: "Automation Control Panel",
+      image: "/images/semi-auto-control-panel.jpg",
+      usage: "Safe burner operation, flame monitoring, and automated emergency shutoffs.",
+      usedBy: "Sun Pharma, pharmaceuticals, chemical curing facilities.",
+      specifications: [
+        { label: "Control Voltage", value: "110V AC Standard" },
+        { label: "Enclosure IP Rating", value: "IP54 Protected" },
+        { label: "Supervision Rate", value: "24/7 Autocheck Cycles" },
+      ],
+      hotspots: [
+        { min: 0, max: 120, label: "Digital Temperature Controller", desc: "Microprocessor-based thermal controller maintains accuracy to ±1°C." },
+        { min: 121, max: 240, label: "Relay Safety Circuit", desc: "Failsafe relay block disconnects power to gas valve upon flame failure." },
+        { min: 241, max: 360, label: "E-Stop Safety Trigger", desc: "Manual emergency override instantly triggers complete fuel purge." }
+      ]
+    }
+  ];
+
+  const activeExplorer = explorerProducts.find((p) => p.id === explorerTab) || explorerProducts[0];
+  const activeHotspot = activeExplorer.hotspots.find(
+    (h) => rotationDegrees >= h.min && rotationDegrees <= h.max
+  ) || activeExplorer.hotspots[0];
+
   const containerRef = useRef<HTMLDivElement>(null);
   const realBurnerRef = useRef<HTMLDivElement>(null);
   const ghostBurnerRef = useRef<HTMLDivElement>(null);
@@ -516,6 +579,133 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* 360° Interactive Product Explorer */}
+      <section className="bg-slate-100 dark:bg-brand-navy/35 py-24 border-b border-slate-200 dark:border-brand-slate/40 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Header */}
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+            <h2 className="text-xs uppercase font-extrabold text-brand-orange tracking-widest">Interactive Inspection</h2>
+            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">360° Product & Applications Explorer</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
+              Select an industrial burner or automation controller below. Drag the range slider to simulate a 360-degree rotation view, scanning key components, usage details, and target client deployments.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left: Tab selection & specifications */}
+            <div className="lg:col-span-4 space-y-6 text-left">
+              <div className="space-y-1.5">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider block">Select Component</span>
+                <div className="flex flex-col space-y-2 bg-white dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-brand-slate/30">
+                  {explorerProducts.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        setExplorerTab(p.id);
+                        setRotationDegrees(0);
+                      }}
+                      className={`text-left px-4 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        explorerTab === p.id
+                          ? "bg-brand-orange text-white shadow-md"
+                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/40"
+                      }`}
+                    >
+                      {p.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Technical Specifications */}
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-6 rounded-xl space-y-4 shadow-sm">
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm border-b border-slate-250 dark:border-slate-800 pb-2">Technical Properties</h4>
+                <div className="space-y-2.5 text-xs">
+                  {activeExplorer.specifications.map((s, idx) => (
+                    <div key={idx} className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/40 last:border-0">
+                      <span className="text-slate-500 font-medium">{s.label}</span>
+                      <span className="font-mono font-bold text-slate-800 dark:text-white">{s.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Center: 360 Rotation Simulation View */}
+            <div className="lg:col-span-5 flex flex-col justify-center items-center bg-white dark:bg-[#060b13]/55 border border-slate-200 dark:border-brand-slate/35 p-8 rounded-2xl shadow-lg relative min-h-[420px]">
+              
+              {/* HUD Details */}
+              <div className="absolute top-4 left-4 font-mono text-[9px] text-slate-400 dark:text-slate-500 space-y-0.5 select-none text-left">
+                <div>[ SCAN_SECTOR: ACTIVE ]</div>
+                <div>[ Y_ANGLE: {rotationDegrees}° ]</div>
+                <div>[ OPTICAL_STABILITY: 100% ]</div>
+              </div>
+
+              {/* Rotatable Product Image container */}
+              <div className="relative w-full h-[220px] flex items-center justify-center overflow-visible select-none mt-4">
+                <div
+                  className="w-full h-full flex items-center justify-center transition-transform duration-100 ease-out"
+                  style={{
+                    transform: `rotateY(${rotationDegrees}deg) rotateX(${rotationDegrees * 0.08}deg)`,
+                  }}
+                >
+                  <img
+                    src={activeExplorer.image}
+                    alt={activeExplorer.name}
+                    className="max-h-[190px] w-auto object-contain filter drop-shadow-[0_15px_40px_rgba(242,100,25,0.12)]"
+                  />
+                </div>
+              </div>
+
+              {/* Angle Slider controller */}
+              <div className="w-full space-y-2 mt-6">
+                <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                  <span>Rotation Angle</span>
+                  <span className="text-brand-orange font-mono font-bold">{rotationDegrees}°</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="360"
+                  value={rotationDegrees}
+                  onChange={(e) => setRotationDegrees(parseInt(e.target.value))}
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-orange"
+                />
+              </div>
+            </div>
+
+            {/* Right: Where it is Used & Who uses it details */}
+            <div className="lg:col-span-3 space-y-6 text-left">
+              
+              {/* Dynamic hotspot description */}
+              <div className="bg-brand-orange/5 border border-brand-orange/20 p-5 rounded-xl space-y-2">
+                <span className="text-[9px] font-bold text-brand-orange uppercase tracking-wider block">Component Scanning</span>
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm">{activeHotspot.label}</h4>
+                <p className="text-slate-500 dark:text-slate-400 text-xs leading-normal">{activeHotspot.desc}</p>
+              </div>
+
+              {/* Where it is Used */}
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-6 rounded-xl space-y-2 shadow-sm">
+                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Industrial Applications</span>
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm">Where It Is Used</h4>
+                <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">{activeExplorer.usage}</p>
+              </div>
+
+              {/* Who Uses It */}
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-6 rounded-xl space-y-2 shadow-sm">
+                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Client Alignments</span>
+                <h4 className="font-bold text-slate-900 dark:text-white text-sm">B2B Deployments</h4>
+                <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">{activeExplorer.usedBy}</p>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
       </section>
 

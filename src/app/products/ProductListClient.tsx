@@ -174,16 +174,32 @@ export default function ProductListClient({
                   href={`/products/${p.slug}`}
                   className="group bg-white dark:bg-[#0a1128]/40 border border-slate-200 dark:border-brand-slate/30 hover:border-slate-300 dark:hover:border-brand-slate rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full text-left relative"
                 >
-                  {/* Card Image fallback design */}
+                   {/* Card Image */}
                   <div className="aspect-[4/3] bg-slate-100 dark:bg-brand-navy relative overflow-hidden flex items-center justify-center border-b border-slate-200 dark:border-brand-slate/30">
-                    <div className="absolute top-2 left-2 z-10 bg-white/90 dark:bg-brand-dark/85 border border-slate-200 dark:border-slate-800 px-2 py-0.5 rounded text-[9px] uppercase tracking-wider text-slate-600 dark:text-slate-400 font-bold shadow-sm">
+                    <div className="absolute top-2 left-2 z-10 bg-white/90 dark:bg-brand-dark/85 border border-slate-200 dark:border-slate-800 px-2 py-0.5 rounded text-[9px] uppercase tracking-wider text-slate-650 dark:text-slate-400 font-bold shadow-sm">
                       {p.category.name}
                     </div>
-                    {isEquipment ? (
-                      <Flame className="w-10 h-10 text-brand-orange/20 group-hover:scale-110 transition-transform group-hover:text-brand-orange/30 duration-300" />
-                    ) : (
-                      <Settings className="w-10 h-10 text-brand-teal/20 group-hover:rotate-45 transition-transform duration-300" />
-                    )}
+                    
+                    <img
+                      src={`/images/${p.slug}.jpg`}
+                      alt={p.name}
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+
+                    {/* Backup fallback icon */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none hidden">
+                      {isEquipment ? (
+                        <Flame className="w-10 h-10 text-brand-orange/20" />
+                      ) : (
+                        <Settings className="w-10 h-10 text-brand-teal/20" />
+                      )}
+                    </div>
+
                     {/* Badge flow type */}
                     <div className="absolute bottom-2 right-2 bg-slate-200 dark:bg-[#060b13] border border-slate-300 dark:border-slate-800 rounded px-2 py-0.5 text-[8px] font-bold text-slate-700 dark:text-slate-400">
                       {p.itemCode}
