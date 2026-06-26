@@ -1,0 +1,185 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum ProductType {
+  EQUIPMENT   // burners, panels — quote flow
+  PART        // spares, pipes, accessories — buy flow
+  SERVICE     // AMC, repair, installation
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum QuoteStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  CONVERTED
+  CLOSED
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  phone         String?
+  passwordHash  String?
+  role          Role     @default(CUSTOMER)
+  company       String?
+  addresses     Address[]
+  orders        Order[]
+  quoteRequests QuoteRequest[]
+  amcContracts  AMCContract[]
+  createdAt     DateTime @default(now())
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String     // Gas Burners, Spare Parts, Control Panels...
+  slug      String     @unique
+  parentId  String?
+  parent    Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Category[] @relation("CategoryTree")
+  products  Product[]
+}
+
+model Product {
+  id            String         @id @default(cuid())
+  name          String
+  slug          String         @unique
+  itemCode      String?        // matches your inventory "Item code"
+  type          ProductType
+  categoryId    String
+  category      Category       @relation(fields: [categoryId], references: [id])
+  shortDesc     String?
+  description   String?        @db.Text
+  images        ProductImage[]
+  specs         ProductSpec[]  // key-value: KW, Fuel Pressure, Weight...
+  price         Int?           // null for quote-only equipment
+  hsn           String?
+  taxRate       String?        // GST@18% etc, from inventory sheet
+  stockQty      Int?           @default(0)
+  minStockQty   Int?           @default(0)
+  unit          String?        // PIECES, SET, SQUARE FEET...
+  isActive      Boolean        @default(true)
+  industries    Industry[]     @relation("ProductIndustries")
+  datasheetUrl  String?
+  quoteRequests QuoteRequest[]
+  orderItems    OrderItem[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  altText   String?
+  position  Int      @default(0)
+}
+
+model ProductSpec {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  label     String  // "Kilo(cal) Min", "Gas Consumption", "Motor (W)"
+  value     String
+  unit      String?
+}
+
+model Industry {
+  id       String    @id @default(cuid())
+  name     String    // Metal Production, Pharmaceutical, Bakery...
+  category String    // INDUSTRY / CHEMICAL / FOOD
+  products Product[] @relation("ProductIndustries")
+}
+
+model Address {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  line1     String
+  line2     String?
+  city      String
+  state     String
+  pincode   String
+  country   String  @default("India")
+  isDefault Boolean @default(false)
+  orders    Order[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items         OrderItem[]
+  subtotal      Int
+  taxAmount     Int
+  shippingFee   Int         @default(0)
+  total         Int
+  status        OrderStatus @default(PENDING)
+  paymentId     String?     // Razorpay payment id
+  paymentMethod String?
+  addressId     String?
+  address       Address?    @relation(fields: [addressId], references: [id])
+  createdAt     DateTime    @default(now())
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Int
+  taxRate   String?
+}
+
+model QuoteRequest {
+  id          String      @id @default(cuid())
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  productId   String
+  product     Product     @relation(fields: [productId], references: [id])
+  name        String
+  company     String?
+  phone       String
+  email       String?
+  message     String?
+  status      QuoteStatus @default(NEW)
+  createdAt   DateTime    @default(now())
+}
+
+model AMCContract {
+  id            String   @id @default(cuid())
+  customerId    String
+  customer      User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  burnerModel   String
+  frequencyDays Int      @default(60)  // every 2 months, per service agreement
+  pricePerVisit Int      @default(799)
+  gstRate       String   @default("18%")
+  startDate     DateTime
+  nextDueDate   DateTime
+  isActive      Boolean  @default(true)
+}
