@@ -10,63 +10,145 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 export default function Home() {
   const [selectedBurner, setSelectedBurner] = useState("ft-03");
   const [systemTime, setSystemTime] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
   // 360 Explorer state
-  const [explorerTab, setExplorerTab] = useState("ft-10");
+  const [explorerTab, setExplorerTab] = useState("ft-3");
   const [rotationDegrees, setRotationDegrees] = useState(0);
 
   const explorerProducts = [
     {
+      id: "ft-3",
+      name: "FT-3 Gas Burner",
+      image: "/images/ft-03.jpg",
+      badge: "COMPACT",
+      output: "35,000 Kcal/hr",
+      usage: "Commercial bakeries, institutional kitchen ovens, small textile drying ovens, and light industrial dryers.",
+      usedBy: "Hotels, bakery chains, small engineering workshops, textile SMEs. Ideal for shops needing 24/7 reliable compact heat.",
+      industries: ["Bakery", "Hospitality", "Textile"],
+      specifications: [
+        { label: "Thermal Output", value: "35,000 Kcal/hr" },
+        { label: "Fuel", value: "LPG / PNG / Natural Gas" },
+        { label: "Gas Pressure", value: "20–50 mbar" },
+        { label: "Motor Power", value: "90 W" },
+        { label: "Power Supply", value: "230V / 1Ph / 50Hz" },
+      ],
+      hotspots: [
+        { min: 0, max: 119, label: "Auto Spark Ignition", desc: "Glazed ceramic spark electrode ignites fuel reliably. No pilot light needed — instant on-demand combustion." },
+        { min: 120, max: 240, label: "Gas Mixing Nozzle", desc: "Precisely engineered air-gas mixing head ensures clean combustion and minimal carbon soot output." },
+        { min: 241, max: 360, label: "Photocell Flame Guard", desc: "UV photocell continuously scans for active flame. Lockout in < 3 seconds if flame is lost." }
+      ]
+    },
+    {
+      id: "ft-5",
+      name: "FT-5 Gas Burner",
+      image: "/images/ft-05.jpg",
+      badge: "POPULAR",
+      output: "90,000 Kcal/hr",
+      usage: "Medium powder-coating ovens, industrial pre-treatment tunnels, paint-drying booths, mid-size bakery tunnel ovens, hot water boilers.",
+      usedBy: "Powder coating SMEs, auto-parts manufacturers, paint shop operators, pharma packaging plants.",
+      industries: ["Powder Coating", "Automotive", "Pharma"],
+      specifications: [
+        { label: "Thermal Output", value: "90,000 Kcal/hr" },
+        { label: "Fuel", value: "LPG / Natural Gas / PNG" },
+        { label: "Gas Pressure", value: "20–50 mbar" },
+        { label: "Motor Power", value: "135 W" },
+        { label: "Blast Tube", value: "6 inch SS" },
+      ],
+      hotspots: [
+        { min: 0, max: 119, label: "Ceramic Ignition Electrode", desc: "Kanthal alloy tip survives repeated thermal cycling up to 1300°C. Easy field replacement." },
+        { min: 120, max: 240, label: "Sealed Combustion Head", desc: "Anti-flame rollback system with positive sealing. Approved for outdoor-rated and weatherproof enclosures." },
+        { min: 241, max: 360, label: "Sequence Controller", desc: "Automatic startup sequence manages pre-purge, ignition, and valve open timing with safety lockout on failure." }
+      ]
+    },
+    {
       id: "ft-10",
       name: "FT-10 Gas Burner",
       image: "/images/ft-10.jpg",
-      usage: "High-capacity steam boiler assemblies & powder coating drying ovens.",
-      usedBy: "Britannia Industries, local engineering plants, chemical facilities.",
+      badge: "INDUSTRIAL",
+      output: "110,000 Kcal/hr",
+      usage: "Large industrial tunnel ovens, autoclave sterilizers, steam generation boilers, large industrial dryers, process heating chambers.",
+      usedBy: "Chemical plants, pharmaceutical manufacturers, large bakeries, metal pre-treatment units, steam boiler operators.",
+      industries: ["Chemical", "Pharma", "Metal"],
       specifications: [
-        { label: "Stoichiometry", value: "Optimal (Lambda 1.15)" },
-        { label: "Temp Limit", value: "1150°C Max Output" },
-        { label: "Gas Pressure", value: "25 - 60 mbar" },
+        { label: "Thermal Output", value: "110,000 Kcal/hr (128 KW)" },
+        { label: "Fuel", value: "LPG / Natural Gas / CNG" },
+        { label: "Gas Pressure", value: "25–60 mbar" },
+        { label: "Motor Power", value: "200 W" },
+        { label: "Blast Tube", value: "12 inch SS" },
       ],
       hotspots: [
-        { min: 0, max: 120, label: "Safety Block", desc: "Monitored automatic gas lock valve prevents back-pressure issues." },
-        { min: 121, max: 240, label: "Combustion Chamber", desc: "Symmetrical high-temperature insulation maintains heat profile." },
-        { min: 241, max: 360, label: "Direct Flame Core", desc: "Self-stabilizing gas nozzle produces uniform, clean combustion." }
+        { min: 0, max: 119, label: "Air Pressure Switch", desc: "Prevents unsafe ignition if blower airflow is insufficient. Mandatory safety interlock for boiler applications." },
+        { min: 120, max: 240, label: "Combustion Chamber Insert", desc: "Cast-iron body withstands harsh environments. Rated for 24/7 continuous operation without downtime." },
+        { min: 241, max: 360, label: "Solenoid Safety Block", desc: "Class A gas solenoid valve cuts fuel in < 1 second on power loss or flame failure detection." }
       ]
     },
     {
-      id: "ft-25",
-      name: "FT-25 Extreme Burner",
-      image: "/images/ft-25.jpg",
-      usage: "Heavy industrial metallurgy foundries, cement plants, and glass-melting kilns.",
-      usedBy: "Reliance Industries, steel manufacturing groups, ceramics plants.",
+      id: "ft-15",
+      name: "FT-15 Two-Stage Burner",
+      image: "/images/ft-15.jpg",
+      badge: "HIGH-TEMP",
+      output: "150,000 Kcal/hr",
+      usage: "Ceramic kilns, glass annealing ovens, forging furnaces, heat-treatment chambers, asphalt mixing plants, galvanizing baths.",
+      usedBy: "Ceramics factories, glass manufacturers, metal heat-treaters, asphalt plant operators, galvanizing plant engineers.",
+      industries: ["Ceramics", "Glass", "Metal"],
       specifications: [
-        { label: "Stoichiometry", value: "Pre-mix Stoichiometric" },
-        { label: "Temp Limit", value: "1400°C Constant" },
-        { label: "Gas Pressure", value: "50 - 120 mbar" },
+        { label: "Thermal Output", value: "150,000 Kcal/hr" },
+        { label: "Max Furnace Temp", value: "1,500 °C" },
+        { label: "Control Type", value: "Two Stage (Hi/Low Fire)" },
+        { label: "Motor Power", value: "200 W" },
+        { label: "Blast Tube", value: "Refractory Grade, 14 inch" },
       ],
       hotspots: [
-        { min: 0, max: 120, label: "Safety Bypass Manifold", desc: "Dual shutoff block solenoid ensures immediate gas kill under 1s." },
-        { min: 121, max: 240, label: "Mixing Nozzle", desc: "Precision-drilled stainless head achieves uniform stoichiometry." },
-        { min: 241, max: 360, label: "UV Photocell Scanner", desc: "Continuous optical monitoring intercepts flame failure issues instantly." }
+        { min: 0, max: 119, label: "Two-Stage Firing Control", desc: "High/low fire switching reduces thermal shock in delicate processes like ceramics and glass annealing." },
+        { min: 120, max: 240, label: "Refractory Blast Tube", desc: "High-temperature rated blast tube with ceramic lining handles continuous 1500°C kiln environments." },
+        { min: 241, max: 360, label: "Siemens LME Sequence", desc: "Siemens LME22 automatic control unit manages startup sequence, safety checks, and two-stage valve timing." }
       ]
     },
     {
-      id: "semi-auto-panel",
-      name: "Automation Control Panel",
-      image: "/images/semi-auto-control-panel.jpg",
-      usage: "Safe burner operation, flame monitoring, and automated emergency shutoffs.",
-      usedBy: "Sun Pharma, pharmaceuticals, chemical curing facilities.",
+      id: "ftd-10",
+      name: "FTD-10 Oil Burner",
+      image: "/images/ftd-10.jpg",
+      badge: "DIESEL/OIL",
+      output: "100,000 Kcal/hr",
+      usage: "Heavy-duty industrial boilers, large textile stenter machines, pharmaceutical WFI distillation units, industrial laundries.",
+      usedBy: "Textile mills, pharma water plants, industrial laundries, large capacity boiler operators, steel plant auxiliary systems.",
+      industries: ["Textile", "Pharma", "Boiler"],
       specifications: [
-        { label: "Control Voltage", value: "110V AC Standard" },
-        { label: "Enclosure IP Rating", value: "IP54 Protected" },
-        { label: "Supervision Rate", value: "24/7 Autocheck Cycles" },
+        { label: "Thermal Output", value: "100,000 Kcal/hr (116 KW)" },
+        { label: "Fuel", value: "HSD / LDO / Diesel" },
+        { label: "Oil Pressure", value: "10 – 20 bar" },
+        { label: "Motor Power", value: "200 W (IP54)" },
+        { label: "Nozzle Type", value: "Dual Atomizing" },
       ],
       hotspots: [
-        { min: 0, max: 120, label: "Digital Temperature Controller", desc: "Microprocessor-based thermal controller maintains accuracy to ±1°C." },
-        { min: 121, max: 240, label: "Relay Safety Circuit", desc: "Failsafe relay block disconnects power to gas valve upon flame failure." },
-        { min: 241, max: 360, label: "E-Stop Safety Trigger", desc: "Manual emergency override instantly triggers complete fuel purge." }
+        { min: 0, max: 119, label: "Suntec Oil Pump", desc: "High-pressure Suntec pump atomizes diesel at 10-20 bar. Self-priming design removes air locks on startup." },
+        { min: 120, max: 240, label: "Dual Atomizing Nozzle", desc: "Dual-orifice nozzle creates ultra-fine fuel mist for complete combustion, reducing smoke and soot." },
+        { min: 241, max: 360, label: "IP54 Motor", desc: "Weatherproof IP54 motor enclosure enables outdoor or rooftop boiler room installation without shelter." }
       ]
-    }
+    },
+    {
+      id: "control-panel",
+      name: "Burner Control Panel",
+      image: "/images/oven-control-panel.jpg",
+      badge: "AUTOMATION",
+      output: "Full Auto",
+      usage: "Automated burner control, flame failure safety monitoring, temperature profiling, conveyor speed control for industrial ovens.",
+      usedBy: "Powder coating operators, pharma clean-room oven managers, food processing plants, industrial bakeries needing precise temperature control.",
+      industries: ["Powder Coating", "Pharma", "Food"],
+      specifications: [
+        { label: "Temperature Control", value: "PID Digital (±1°C)" },
+        { label: "Control Voltage", value: "230V / 415V AC" },
+        { label: "Enclosure", value: "IP54 Powder-Coated" },
+        { label: "Thermocouple Input", value: "K-Type / J-Type" },
+        { label: "Motors Supported", value: "1 or 2 Motors" },
+      ],
+      hotspots: [
+        { min: 0, max: 119, label: "PID Temperature Controller", desc: "Digital PID controller maintains oven temperature within ±1°C. Auto-tune function speeds up commissioning." },
+        { min: 120, max: 240, label: "Relay Safety Circuit", desc: "Failsafe relay disconnects gas solenoid power if photocell detects flame failure. Prevents unsafe restarts." },
+        { min: 241, max: 360, label: "Motor Overload Protection", desc: "Individual thermal overload relays per motor prevent burnout. Trip indication and manual reset on panel front." }
+      ]
+    },
   ];
 
   const activeExplorer = explorerProducts.find((p) => p.id === explorerTab) || explorerProducts[0];
@@ -85,6 +167,9 @@ export default function Home() {
   const spot3Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setIsMounted(true);
+    // Set initial time immediately on mount
+    setSystemTime(new Date().toISOString().replace("T", " ").substring(0, 19));
     // Keep dynamic system clock ticking
     const timer = setInterval(() => {
       setSystemTime(new Date().toISOString().replace("T", " ").substring(0, 19));
@@ -221,17 +306,17 @@ export default function Home() {
 
   const coreBenefits = [
     {
-      icon: <Activity className="w-6 h-6 text-brand-orange" />,
+      iconName: "activity" as const,
       title: "Optimized Fuel-to-Air Ratio",
       description: "Custom gas nozzle mixing design achieves complete combustion, lowering carbon soot and fuel consumption by up to 15%.",
     },
     {
-      icon: <Cpu className="w-6 h-6 text-brand-orange" />,
+      iconName: "cpu" as const,
       title: "Microprocessor-Safe Controls",
       description: "Our burner panels integrate self-checking flame supervision diagnostics, UV photocells, and emergency fuel cutoffs.",
     },
     {
-      icon: <Wrench className="w-6 h-6 text-brand-orange" />,
+      iconName: "wrench" as const,
       title: "470+ Standard Spares in Stock",
       description: "Ready-to-ship replacement valves, ignition electrodes, hoses, and controllers minimizing plant downtime.",
     },
@@ -281,8 +366,11 @@ export default function Home() {
           <div className="absolute top-24 left-6 text-[9px] font-mono tracking-widest text-slate-400 dark:text-slate-500 uppercase select-none z-10 hidden sm:block">
             [ FT_SYS_TRACKER: 0.1.0-REV4 ]
           </div>
-          <div className="absolute top-24 right-6 text-[9px] font-mono tracking-widest text-slate-400 dark:text-slate-500 uppercase select-none z-10 hidden sm:block">
-            [ SYS_TIME: {systemTime || "CONNECTING..."} ]
+          <div
+            suppressHydrationWarning
+            className="absolute top-24 right-6 text-[9px] font-mono tracking-widest text-slate-400 dark:text-slate-500 uppercase select-none z-10 hidden sm:block"
+          >
+            {isMounted ? `[ SYS_TIME: ${systemTime} ]` : "[ SYS_TIME: -- ]"}
           </div>
           <div className="absolute bottom-6 left-6 text-[9px] font-mono tracking-widest text-slate-400 dark:text-slate-500 uppercase select-none z-10 hidden sm:block">
             [ GPS: 23°02'N // 72°35'E ]
@@ -589,83 +677,108 @@ export default function Home() {
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
             <h2 className="text-xs uppercase font-extrabold text-brand-orange tracking-widest">Interactive Inspection</h2>
-            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">360° Product & Applications Explorer</h3>
+            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">360° Product &amp; Applications Explorer</h3>
             <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
-              Select an industrial burner or automation controller below. Drag the range slider to simulate a 360-degree rotation view, scanning key components, usage details, and target client deployments.
+              Select any burner or panel below. Rotate the slider to inspect key components — see exactly where each product is used, who deploys it, and what specifications make it the industrial standard.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            
-            {/* Left: Tab selection & specifications */}
-            <div className="lg:col-span-4 space-y-6 text-left">
-              <div className="space-y-1.5">
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider block">Select Component</span>
-                <div className="flex flex-col space-y-2 bg-white dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-brand-slate/30">
-                  {explorerProducts.map((p) => (
-                    <button
-                      key={p.id}
-                      onClick={() => {
-                        setExplorerTab(p.id);
-                        setRotationDegrees(0);
-                      }}
-                      className={`text-left px-4 py-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        explorerTab === p.id
-                          ? "bg-brand-orange text-white shadow-md"
-                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/40"
-                      }`}
-                    >
-                      {p.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
+          {/* Product selector tabs — horizontal scrollable on mobile */}
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-10 justify-start lg:justify-center scrollbar-hide">
+            {explorerProducts.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => { setExplorerTab(p.id); setRotationDegrees(0); }}
+                className={`shrink-0 flex flex-col items-center gap-1 px-4 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  explorerTab === p.id
+                    ? "bg-brand-orange text-white border-brand-orange shadow-md shadow-brand-orange/20"
+                    : "bg-white dark:bg-slate-900/60 border-slate-200 dark:border-brand-slate/30 text-slate-700 dark:text-slate-300 hover:border-brand-orange/40"
+                }`}
+              >
+                <span className={`text-[9px] font-extrabold tracking-wider px-1.5 py-0.5 rounded ${
+                  explorerTab === p.id ? "bg-white/20" : "bg-brand-orange/10 text-brand-orange"
+                }`}>{p.badge}</span>
+                <span>{p.name}</span>
+                <span className={`text-[9px] font-mono ${
+                  explorerTab === p.id ? "text-white/70" : "text-slate-400"
+                }`}>{p.output}</span>
+              </button>
+            ))}
+          </div>
 
-              {/* Technical Specifications */}
-              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-6 rounded-xl space-y-4 shadow-sm">
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm border-b border-slate-250 dark:border-slate-800 pb-2">Technical Properties</h4>
-                <div className="space-y-2.5 text-xs">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Left: Technical Specifications */}
+            <div className="lg:col-span-3 space-y-4 text-left">
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-5 rounded-xl space-y-3 shadow-sm">
+                <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2 mb-1">
+                  <Settings className="w-4 h-4 text-brand-orange" />
+                  <h4 className="font-bold text-slate-900 dark:text-white text-sm">Technical Specs</h4>
+                </div>
+                <div className="space-y-2 text-xs">
                   {activeExplorer.specifications.map((s, idx) => (
                     <div key={idx} className="flex justify-between py-1 border-b border-slate-100 dark:border-slate-800/40 last:border-0">
                       <span className="text-slate-500 font-medium">{s.label}</span>
-                      <span className="font-mono font-bold text-slate-800 dark:text-white">{s.value}</span>
+                      <span className="font-mono font-bold text-slate-800 dark:text-white text-right ml-2">{s.value}</span>
                     </div>
                   ))}
                 </div>
               </div>
+
+              {/* Industries */}
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-5 rounded-xl shadow-sm">
+                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-2">Industries</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {activeExplorer.industries.map((ind) => (
+                    <span key={ind} className="bg-brand-orange/10 text-brand-orange text-[9px] font-bold px-2 py-1 rounded uppercase tracking-wide">{ind}</span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Where used */}
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-5 rounded-xl shadow-sm">
+                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Where It Is Used</span>
+                <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">{activeExplorer.usage}</p>
+              </div>
             </div>
 
             {/* Center: 360 Rotation Simulation View */}
-            <div className="lg:col-span-5 flex flex-col justify-center items-center bg-white dark:bg-[#060b13]/55 border border-slate-200 dark:border-brand-slate/35 p-8 rounded-2xl shadow-lg relative min-h-[420px]">
+            <div className="lg:col-span-6 flex flex-col justify-center items-center bg-white dark:bg-[#060b13]/55 border border-slate-200 dark:border-brand-slate/35 p-8 rounded-2xl shadow-lg relative min-h-[440px]">
               
               {/* HUD Details */}
               <div className="absolute top-4 left-4 font-mono text-[9px] text-slate-400 dark:text-slate-500 space-y-0.5 select-none text-left">
                 <div>[ SCAN_SECTOR: ACTIVE ]</div>
                 <div>[ Y_ANGLE: {rotationDegrees}° ]</div>
-                <div>[ OPTICAL_STABILITY: 100% ]</div>
+                <div>[ MODEL: {activeExplorer.badge} ]</div>
+              </div>
+              <div className="absolute top-4 right-4 font-mono text-[9px] text-slate-400 dark:text-slate-500 select-none text-right">
+                <div>[ OUTPUT: {activeExplorer.output} ]</div>
               </div>
 
-              {/* Rotatable Product Image container */}
-              <div className="relative w-full h-[220px] flex items-center justify-center overflow-visible select-none mt-4">
+              {/* Product Image - rotatable */}
+              <div className="relative w-full h-[260px] flex items-center justify-center overflow-visible select-none mt-4">
                 <div
                   className="w-full h-full flex items-center justify-center transition-transform duration-100 ease-out"
-                  style={{
-                    transform: `rotateY(${rotationDegrees}deg) rotateX(${rotationDegrees * 0.08}deg)`,
-                  }}
+                  style={{ transform: `perspective(1000px) rotateY(${rotationDegrees * 0.3}deg)` }}
                 >
                   <img
                     src={activeExplorer.image}
                     alt={activeExplorer.name}
-                    className="max-h-[190px] w-auto object-contain filter drop-shadow-[0_15px_40px_rgba(242,100,25,0.12)]"
+                    onError={(e) => { e.currentTarget.src = "/images/hero-burner.png"; }}
+                    className="max-h-[240px] w-auto object-contain filter drop-shadow-[0_20px_50px_rgba(242,100,25,0.18)] transition-all duration-300"
                   />
+                </div>
+                {/* Hotspot glow ring */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="w-48 h-48 rounded-full border border-brand-orange/10 animate-pulse" style={{ animationDuration: "3s" }} />
                 </div>
               </div>
 
               {/* Angle Slider controller */}
               <div className="w-full space-y-2 mt-6">
                 <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                  <span>Rotation Angle</span>
-                  <span className="text-brand-orange font-mono font-bold">{rotationDegrees}°</span>
+                  <span>Drag to Inspect</span>
+                  <span className="text-brand-orange font-mono font-bold">{rotationDegrees}° View</span>
                 </div>
                 <input
                   type="range"
@@ -673,39 +786,304 @@ export default function Home() {
                   max="360"
                   value={rotationDegrees}
                   onChange={(e) => setRotationDegrees(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-orange"
+                  className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-orange"
                 />
+                <div className="flex justify-between text-[9px] text-slate-400 font-mono">
+                  <span>0° Front</span>
+                  <span>90° Side</span>
+                  <span>180° Rear</span>
+                  <span>270° Side</span>
+                  <span>360° Front</span>
+                </div>
+              </div>
+
+              {/* Active hotspot description bar */}
+              <div className="w-full mt-5 p-4 bg-brand-orange/5 border border-brand-orange/20 rounded-xl">
+                <span className="text-[9px] font-bold text-brand-orange uppercase tracking-wider block mb-1">
+                  [SCAN] {activeHotspot.label}
+                </span>
+                <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">{activeHotspot.desc}</p>
               </div>
             </div>
 
-            {/* Right: Where it is Used & Who uses it details */}
-            <div className="lg:col-span-3 space-y-6 text-left">
-              
-              {/* Dynamic hotspot description */}
-              <div className="bg-brand-orange/5 border border-brand-orange/20 p-5 rounded-xl space-y-2">
-                <span className="text-[9px] font-bold text-brand-orange uppercase tracking-wider block">Component Scanning</span>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm">{activeHotspot.label}</h4>
-                <p className="text-slate-500 dark:text-slate-400 text-xs leading-normal">{activeHotspot.desc}</p>
+            {/* Right: Who uses it & CTA */}
+            <div className="lg:col-span-3 space-y-4 text-left">
+              <div className="bg-brand-orange text-white p-5 rounded-xl space-y-2 shadow-lg">
+                <span className="text-[9px] font-bold uppercase tracking-wider opacity-80 block">Featured Product</span>
+                <h4 className="font-black text-lg">{activeExplorer.name}</h4>
+                <div className="text-white/80 text-xs">Output: <span className="font-bold font-mono text-white">{activeExplorer.output}</span></div>
+                <Link
+                  href="/products"
+                  className="block text-center w-full py-2 bg-white text-brand-orange font-bold rounded text-xs tracking-wider uppercase mt-3 hover:bg-orange-50 transition-all"
+                >
+                  View Full Specs →
+                </Link>
+                <Link
+                  href="/contact"
+                  className="block text-center w-full py-2 bg-white/20 hover:bg-white/30 text-white font-bold rounded text-xs tracking-wider uppercase transition-all border border-white/30"
+                >
+                  Request Quote
+                </Link>
               </div>
 
-              {/* Where it is Used */}
-              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-6 rounded-xl space-y-2 shadow-sm">
-                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Industrial Applications</span>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm">Where It Is Used</h4>
-                <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">{activeExplorer.usage}</p>
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-5 rounded-xl shadow-sm">
+                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block mb-1">Who Deploys It</span>
+                <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">{activeExplorer.usedBy}</p>
               </div>
 
-              {/* Who Uses It */}
-              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-6 rounded-xl space-y-2 shadow-sm">
-                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Client Alignments</span>
-                <h4 className="font-bold text-slate-900 dark:text-white text-sm">B2B Deployments</h4>
-                <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">{activeExplorer.usedBy}</p>
+              {/* Component Hotspot indicators */}
+              <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-5 rounded-xl shadow-sm space-y-2">
+                <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Component Zones</span>
+                {activeExplorer.hotspots.map((h, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setRotationDegrees(h.min + 10)}
+                    className={`w-full text-left p-2 rounded-lg text-xs transition-all cursor-pointer ${
+                      activeHotspot.label === h.label
+                        ? "bg-brand-orange/10 border border-brand-orange/30 text-brand-orange"
+                        : "hover:bg-slate-50 dark:hover:bg-slate-800/40 text-slate-600 dark:text-slate-400 border border-transparent"
+                    }`}
+                  >
+                    <span className="font-bold block">{h.label}</span>
+                    <span className="text-[9px] opacity-70">{h.min}° – {h.max}° view range</span>
+                  </button>
+                ))}
               </div>
-
             </div>
 
           </div>
 
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* FEATURED PRODUCTS — 6 product showcase with full detail */}
+      {/* ================================================================ */}
+      <section className="bg-white dark:bg-brand-dark py-24 border-b border-slate-200 dark:border-brand-slate/40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
+            <h2 className="text-xs uppercase font-extrabold text-brand-orange tracking-widest">Our Product Line</h2>
+            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Featured Industrial Products</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
+              From compact bakery burners to 450,000 Kcal/hr industrial furnace systems — every product is designed in-house, assembled with CE-grade components, and backed by our 24-hour service SLA.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {[
+              {
+                slug: "ft-5-gas-burner",
+                name: "FT-5 Gas Burner",
+                badge: "BESTSELLER",
+                badgeColor: "bg-brand-orange",
+                image: "/images/ft-05.jpg",
+                output: "90,000 Kcal/hr",
+                category: "Gas Burner",
+                price: "₹32,000",
+                priceNote: "+ 18% GST",
+                desc: "Fully automatic single-stage gas burner for powder coating ovens, industrial pre-treatment tunnels, and bakery operations. Includes auto sequence controller, UV photocell flame guard, and stainless blast tube.",
+                tags: ["LPG", "PNG", "Natural Gas"],
+                specs: [
+                  { label: "Output", value: "90,000 Kcal/hr" },
+                  { label: "Motor", value: "135 W" },
+                  { label: "Blast Tube", value: "6 inch SS" },
+                ],
+                usedIn: ["Powder Coating Ovens", "Bakery Tunnels", "Pre-Treatment Lines"],
+              },
+              {
+                slug: "ft-10-gas-burner",
+                name: "FT-10 Gas Burner",
+                badge: "INDUSTRIAL",
+                badgeColor: "bg-slate-700",
+                image: "/images/ft-10.jpg",
+                output: "110,000 Kcal/hr",
+                category: "Gas Burner",
+                price: "₹35,000",
+                priceNote: "+ 18% GST",
+                desc: "Heavy-duty industrial gas burner rated for continuous 24/7 operation. Ideal for large autoclave sterilizers, steam boilers, industrial drying chambers, and chemical process heating units.",
+                tags: ["CNG", "LPG", "Natural Gas"],
+                specs: [
+                  { label: "Output", value: "110,000 Kcal/hr" },
+                  { label: "Motor", value: "200 W" },
+                  { label: "Blast Tube", value: "12 inch SS" },
+                ],
+                usedIn: ["Steam Boilers", "Autoclave Systems", "Process Heating"],
+              },
+              {
+                slug: "ft-15-two-stage-gas-burner",
+                name: "FT-15 Two-Stage Burner",
+                badge: "HIGH-TEMP",
+                badgeColor: "bg-red-600",
+                image: "/images/ft-15.jpg",
+                output: "150,000 Kcal/hr",
+                category: "Gas Burner",
+                price: "₹45,000",
+                priceNote: "+ 18% GST",
+                desc: "Two-stage high-temperature gas burner for ceramic kilns, glass annealing ovens, and metal heat-treatment furnaces. Siemens LME sequence controller, refractory blast tube, and high/low fire modulation.",
+                tags: ["1500°C Rated", "Two-Stage", "Siemens"],
+                specs: [
+                  { label: "Max Temp", value: "1,500 °C" },
+                  { label: "Motor", value: "200 W" },
+                  { label: "Control", value: "Hi/Lo Fire" },
+                ],
+                usedIn: ["Ceramic Kilns", "Glass Annealing", "Forging Furnaces"],
+              },
+              {
+                slug: "ft-25-gas-burner",
+                name: "FT-25 Industrial Burner",
+                badge: "FLAGSHIP",
+                badgeColor: "bg-purple-700",
+                image: "/images/ft-25.jpg",
+                output: "450,000 Kcal/hr",
+                category: "Gas Burner",
+                price: "Quote Only",
+                priceNote: "B2B enquiry",
+                desc: "FlameTech's most powerful gas burner. 1HP motor, 6-inch SS blast tube, Siemens LME73 controller, and air damper servo motor. CE-compliant low-NOx design for rotary kilns, asphalt drums, and large boilers.",
+                tags: ["1HP Motor", "Siemens", "Low-NOx"],
+                specs: [
+                  { label: "Output", value: "450,000 Kcal/hr" },
+                  { label: "Motor", value: "1 HP" },
+                  { label: "Controller", value: "Siemens LME73" },
+                ],
+                usedIn: ["Rotary Kilns", "Asphalt Plants", "Utility Boilers"],
+              },
+              {
+                slug: "ftd-10-oil-burner",
+                name: "FTD-10 Diesel Oil Burner",
+                badge: "OIL/DIESEL",
+                badgeColor: "bg-amber-600",
+                image: "/images/ftd-10.jpg",
+                output: "100,000 Kcal/hr",
+                category: "Oil Burner",
+                price: "₹56,000",
+                priceNote: "+ 18% GST",
+                desc: "Heavy-duty diesel oil burner with dual atomizing nozzle, Suntec high-pressure pump, and IP54 weatherproof motor. Suitable for textile stenter machines, pharma WFI units, and industrial laundry boilers.",
+                tags: ["HSD", "LDO", "IP54 Motor"],
+                specs: [
+                  { label: "Output", value: "100,000 Kcal/hr" },
+                  { label: "Oil Pressure", value: "10–20 bar" },
+                  { label: "Nozzle", value: "Dual Atomizing" },
+                ],
+                usedIn: ["Textile Stenters", "Pharma Boilers", "Industrial Laundry"],
+              },
+              {
+                slug: "oven-control-panel",
+                name: "Oven Control Panel",
+                badge: "AUTOMATION",
+                badgeColor: "bg-teal-600",
+                image: "/images/oven-control-panel.jpg",
+                output: "Full Auto",
+                category: "Control Panel",
+                price: "₹10,000",
+                priceNote: "+ 18% GST",
+                desc: "Complete oven control panel with PID temperature controller (±1°C accuracy), K/J thermocouple input, burner relay control, conveyor speed control, and motor overload protection. Factory tested and pre-wired.",
+                tags: ["PID Control", "IP54", "K-Type"],
+                specs: [
+                  { label: "Accuracy", value: "±1°C" },
+                  { label: "Temp Range", value: "0–1200°C" },
+                  { label: "Enclosure", value: "IP54" },
+                ],
+                usedIn: ["Powder Coating Ovens", "Food Processing", "Pharma Clean Rooms"],
+              },
+            ].map((product) => (
+              <div
+                key={product.slug}
+                className="group flex flex-col bg-slate-50 dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/30 rounded-2xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 shadow-sm"
+              >
+                {/* Image */}
+                <div className="relative overflow-hidden h-52 bg-white dark:bg-[#060b13]/40 flex items-center justify-center">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    onError={(e) => { e.currentTarget.src = "/images/hero-burner.png"; }}
+                    className="h-44 w-auto object-contain group-hover:scale-105 transition-transform duration-500 filter drop-shadow-md"
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span className={`${product.badgeColor} text-white text-[9px] font-extrabold tracking-wider px-2.5 py-1 rounded uppercase`}>
+                      {product.badge}
+                    </span>
+                  </div>
+                  <div className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 text-[10px] font-bold text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded">
+                    {product.category}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex flex-col flex-1 p-6 space-y-4">
+                  <div>
+                    <div className="flex items-start justify-between mb-1">
+                      <h4 className="text-slate-900 dark:text-white font-bold text-base">{product.name}</h4>
+                    </div>
+                    <div className="text-brand-orange font-mono text-xs font-bold">{product.output}</div>
+                  </div>
+
+                  <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">{product.desc}</p>
+
+                  {/* Mini specs */}
+                  <div className="bg-white dark:bg-slate-900/40 rounded-lg p-3 space-y-1">
+                    {product.specs.map((s, si) => (
+                      <div key={si} className="flex justify-between text-xs">
+                        <span className="text-slate-500">{s.label}</span>
+                        <span className="font-bold font-mono text-slate-800 dark:text-white">{s.value}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Used in tags */}
+                  <div>
+                    <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider block mb-1.5">Used In:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {product.usedIn.map((u) => (
+                        <span key={u} className="bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[9px] font-bold px-2 py-0.5 rounded">{u}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Fuel tags */}
+                  <div className="flex flex-wrap gap-1">
+                    {product.tags.map((tag) => (
+                      <span key={tag} className="border border-brand-orange/30 text-brand-orange text-[9px] font-bold px-2 py-0.5 rounded">{tag}</span>
+                    ))}
+                  </div>
+
+                  {/* Price & CTA */}
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800 mt-auto">
+                    <div>
+                      <div className="text-slate-900 dark:text-white font-black text-base">{product.price}</div>
+                      <div className="text-slate-400 text-[9px]">{product.priceNote}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/products/${product.slug}`}
+                        className="px-3 py-2 bg-brand-orange/10 hover:bg-brand-orange/20 border border-brand-orange/30 text-brand-orange text-[10px] font-bold rounded uppercase tracking-wide transition-all"
+                      >
+                        Details
+                      </Link>
+                      <Link
+                        href="/contact"
+                        className="px-3 py-2 bg-brand-orange hover:bg-brand-orange/90 text-white text-[10px] font-bold rounded uppercase tracking-wide transition-all"
+                      >
+                        Quote
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* View all CTA */}
+          <div className="text-center mt-12">
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-brand-orange hover:bg-brand-orange/90 text-white font-bold rounded-lg text-sm shadow-lg shadow-brand-orange/20 transition-all hover:scale-105"
+            >
+              <Flame className="w-4 h-4" />
+              <span>View Full Product Catalog</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <p className="text-slate-400 dark:text-slate-500 text-xs mt-3">35+ products across 5 categories · Spare parts · Services · AMC Contracts</p>
+          </div>
         </div>
       </section>
 
@@ -727,7 +1105,9 @@ export default function Home() {
                 className="bg-slate-50 dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/30 p-8 rounded-xl text-left space-y-4 transition-transform hover:-translate-y-1 shadow-sm"
               >
                 <div className="bg-brand-orange/10 w-12 h-12 rounded-lg flex items-center justify-center mb-2">
-                  {benefit.icon}
+                  {benefit.iconName === "activity" && <Activity className="w-6 h-6 text-brand-orange" />}
+                  {benefit.iconName === "cpu" && <Cpu className="w-6 h-6 text-brand-orange" />}
+                  {benefit.iconName === "wrench" && <Wrench className="w-6 h-6 text-brand-orange" />}
                 </div>
                 <h4 className="text-lg font-bold text-slate-900 dark:text-white">{benefit.title}</h4>
                 <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{benefit.description}</p>
