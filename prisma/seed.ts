@@ -965,6 +965,7 @@ async function main() {
         isActive: true,
         datasheetUrl: `/datasheets/${slug}-spec.pdf`,
         images: { create: [{ url: `/images/${imgSlug}.jpg`, altText: b.name, position: 0 }] },
+        image: `/images/${imgSlug}.jpg`,
         specs: { create: b.specs },
         industries: industryIds.length ? { connect: industryIds } : undefined,
       },
@@ -991,6 +992,7 @@ async function main() {
         unit: p.unit,
         isActive: true,
         images: { create: [{ url: `/images/${imgSlug}.jpg`, altText: p.name, position: 0 }] },
+        image: `/images/${imgSlug}.jpg`,
         specs: { create: p.specs },
       },
     });
@@ -1016,6 +1018,7 @@ async function main() {
         unit: part.unit,
         isActive: true,
         images: { create: [{ url: `/images/${imgSlug}.jpg`, altText: part.name, position: 0 }] },
+        image: `/images/${imgSlug}.jpg`,
         specs: { create: part.specs },
       },
     });
@@ -1041,6 +1044,7 @@ async function main() {
         unit: svc.unit,
         isActive: true,
         images: { create: [{ url: `/images/${imgSlug}.jpg`, altText: svc.name, position: 0 }] },
+        image: `/images/${imgSlug}.jpg`,
         specs: { create: svc.specs },
       },
     });

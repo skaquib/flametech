@@ -9,6 +9,7 @@ interface Product {
   id: string;
   name: string;
   slug: string;
+  image?: string | null;
   itemCode: string | null;
   type: "EQUIPMENT" | "PART" | "SERVICE";
   category: {
@@ -68,7 +69,7 @@ export default function ProductListClient({
       slug: product.slug,
       itemCode: product.itemCode,
       price: product.price || 0,
-      image: `/images/${product.slug}.jpg`,
+      image: product.image || `/images/${product.slug}.jpg`,
       taxRate: product.taxRate,
     });
 
@@ -181,7 +182,7 @@ export default function ProductListClient({
                     </div>
                     
                     <img
-                      src={`/images/${p.slug}.jpg`}
+                      src={p.image || `/images/${p.slug}.jpg`}
                       alt={p.name}
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';

@@ -25,7 +25,7 @@ export const POST = auth(async function POST(req) {
 
   try {
     const body = await req.json();
-    const { name, slug, itemCode, type, categoryId, shortDesc, description, price, hsn, taxRate, stockQty, unit, specs } = body;
+    const { name, slug, itemCode, type, categoryId, shortDesc, description, price, hsn, taxRate, stockQty, unit, specs, image } = body;
 
     const category = await prisma.category.findUnique({
       where: { slug: categoryId },
@@ -47,6 +47,7 @@ export const POST = auth(async function POST(req) {
         taxRate,
         stockQty,
         unit,
+        image,
         specs: {
           create: specs.map((s: any) => ({
             label: s.label,

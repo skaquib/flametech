@@ -72,6 +72,7 @@ model Product {
   shortDesc     String?
   description   String?        @db.Text
   images        ProductImage[]
+  image         String?        // database-persisted image URL or upload
   specs         ProductSpec[]  // key-value: KW, Fuel Pressure, Weight...
   price         Int?           // null for quote-only equipment
   hsn           String?

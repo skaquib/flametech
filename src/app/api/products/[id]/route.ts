@@ -35,7 +35,7 @@ export const PATCH = auth(async function PATCH(req, context: any) {
 
   try {
     const body = await req.json();
-    const { name, slug, itemCode, type, categoryId, shortDesc, description, price, hsn, taxRate, stockQty, unit, specs, isActive } = body;
+    const { name, slug, itemCode, type, categoryId, shortDesc, description, price, hsn, taxRate, stockQty, unit, specs, isActive, image } = body;
 
     const updateData: any = {};
     if (isActive !== undefined) updateData.isActive = isActive;
@@ -50,6 +50,7 @@ export const PATCH = auth(async function PATCH(req, context: any) {
     if (taxRate !== undefined) updateData.taxRate = taxRate;
     if (stockQty !== undefined) updateData.stockQty = stockQty;
     if (unit !== undefined) updateData.unit = unit;
+    if (image !== undefined) updateData.image = image;
 
     if (categoryId !== undefined) {
       const category = await prisma.category.findUnique({

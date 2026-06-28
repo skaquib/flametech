@@ -15,6 +15,7 @@ interface Product {
   id: string;
   name: string;
   slug: string;
+  image?: string | null;
   itemCode: string | null;
   type: "EQUIPMENT" | "PART" | "SERVICE";
   category: {
@@ -82,7 +83,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
       slug: product.slug,
       itemCode: product.itemCode,
       price: product.price || 0,
-      image: `/images/${product.slug}.jpg`,
+      image: product.image || `/images/${product.slug}.jpg`,
       taxRate: product.taxRate,
     }, quantity);
 
@@ -157,7 +158,7 @@ ${quoteForm.message || "N/A"}`;
         {/* Product Image Showcase */}
         <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center group shadow-md">
           <img
-            src={`/images/${product.slug}.jpg`}
+            src={product.image || `/images/${product.slug}.jpg`}
             alt={product.name}
             onError={(e) => {
               e.currentTarget.style.display = 'none';

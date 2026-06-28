@@ -27,6 +27,7 @@ export default function EditProductPage() {
     taxRate: "18%",
     stockQty: "0",
     unit: "SET",
+    image: "",
   });
 
   // Dynamic specs fields
@@ -53,6 +54,7 @@ export default function EditProductPage() {
           taxRate: data.taxRate || "18%",
           stockQty: data.stockQty !== null && data.stockQty !== undefined ? String(data.stockQty) : "0",
           unit: data.unit || "SET",
+          image: data.image || "",
         });
 
         if (data.specs && Array.isArray(data.specs)) {
@@ -283,6 +285,58 @@ export default function EditProductPage() {
             </div>
           </div>
         )}
+
+        {/* Product Image Showcase & Upload */}
+        <div className="bg-white dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl space-y-4">
+          <h3 className="text-slate-900 dark:text-white font-bold text-sm border-b border-slate-200 dark:border-brand-slate/30 pb-2">Product Image</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+            {/* Image Preview Container */}
+            <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center">
+              {form.image ? (
+                <img
+                  src={form.image}
+                  alt="Product preview"
+                  className="w-full h-full object-contain p-2"
+                />
+              ) : (
+                <span className="text-xs text-slate-400 italic">No image uploaded</span>
+              )}
+            </div>
+
+            {/* URL/Upload input fields */}
+            <div className="col-span-2 space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Image Path / URL</label>
+                <input
+                  type="text"
+                  value={form.image}
+                  onChange={(e) => setForm({ ...form, image: e.target.value })}
+                  placeholder="e.g., /images/ft-05.jpg"
+                  className="w-full bg-slate-50 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Upload New Image File</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        setForm({ ...form, image: reader.result as string });
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-orange/15 file:text-brand-orange hover:file:bg-brand-orange/20 cursor-pointer"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Short & Long descriptions */}
         <div className="bg-[#0a1128]/50 border border-brand-slate/40 p-6 rounded-xl space-y-4">

@@ -1,15 +1,35 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { LayoutDashboard, ShoppingBag, ClipboardList, Package, LogOut, Globe, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, ClipboardList, Package, LogOut, Globe, ShieldAlert, Sun, Moon } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, status } = useSession();
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const initialTheme = root.classList.contains("dark") ? "dark" : "light";
+    setTheme(initialTheme);
+  }, []);
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    if (theme === "dark") {
+      root.classList.remove("dark");
+      localStorage.setItem("flametech-theme", "light");
+      setTheme("light");
+    } else {
+      root.classList.add("dark");
+      localStorage.setItem("flametech-theme", "dark");
+      setTheme("dark");
+    }
+  };
 
   // Loading safety
   if (status === "loading") {
@@ -47,9 +67,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="dark min-h-screen bg-brand-dark text-slate-100 flex text-left">
+    <div className={`min-h-screen bg-slate-50 dark:bg-brand-dark text-slate-900 dark:text-slate-100 flex text-left transition-colors duration-300`}>
       {/* Sidebar */}
-      <aside className="w-64 bg-[#0a1128] border-r border-brand-slate/40 flex flex-col justify-between shrink-0">
+      <aside className="w-64 bg-white dark:bg-[#0a1128] border-r border-slate-200 dark:border-brand-slate/40 flex flex-col justify-between shrink-0 transition-colors duration-300">
         <div className="p-6 space-y-8">
           {/* Logo */}
           <div className="flex items-center space-x-2">
@@ -57,7 +77,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               FT
             </div>
             <div>
-              <span className="font-extrabold text-sm tracking-wider text-white">
+              <span className="font-extrabold text-sm tracking-wider text-slate-800 dark:text-white">
                 FLAME<span className="text-brand-orange">TECH</span>
               </span>
               <span className="block text-[8px] uppercase tracking-widest text-slate-500 font-bold leading-none">
@@ -77,7 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   className={`flex items-center space-x-3 px-3 py-2.5 rounded-md text-xs font-bold transition-all ${
                     isActive
                       ? "bg-brand-orange/15 text-brand-orange border-l-2 border-brand-orange"
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/20"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-900 hover:dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800/20"
                   }`}
                 >
                   {link.icon}
@@ -89,17 +109,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* Bottom Actions */}
-        <div className="p-6 border-t border-slate-800/60 space-y-2">
+        <div className="p-6 border-t border-slate-200 dark:border-slate-800/60 space-y-2">
           <Link
             href="/"
-            className="flex items-center space-x-3 px-3 py-2 text-xs text-slate-400 hover:text-white font-semibold"
+            className="flex items-center space-x-3 px-3 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 hover:dark:text-white font-semibold"
           >
             <Globe className="w-4 h-4 text-brand-teal" />
             <span>Go to Public Site</span>
           </Link>
           <button
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="w-full flex items-center space-x-3 px-3 py-2 text-xs text-red-400 hover:text-red-300 font-semibold text-left"
+            className="w-full flex items-center space-x-3 px-3 py-2 text-xs text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 font-semibold text-left"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out Admin</span>
@@ -110,11 +130,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main panel container */}
       <div className="flex-1 flex flex-col overflow-y-auto">
         {/* Header toolbar */}
-        <header className="h-16 border-b border-brand-slate/40 flex items-center justify-between px-8 bg-[#0a1128]/35 backdrop-blur">
-          <div className="text-slate-400 text-xs font-semibold">
-            Logged in: <span className="text-white font-bold">{session.user.name}</span> ({session.user.role})
+        <header className="h-16 border-b border-slate-200 dark:border-brand-slate/40 flex items-center justify-between px-8 bg-white/70 dark:bg-[#0a1128]/35 backdrop-blur transition-colors duration-300">
+          <div className="text-slate-500 dark:text-slate-400 text-xs font-semibold">
+            Logged in: <span className="text-slate-900 dark:text-white font-bold">{session.user.name}</span> ({session.user.role})
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              type="button"
+              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Toggle theme mode"
+            >
+              {theme === "dark" ? (
+                <Sun className="w-4 h-4 text-brand-orange" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-600" />
+              )}
+            </button>
+            
             <span className="px-2 py-0.5 bg-brand-orange/10 border border-brand-orange/30 text-[9px] font-bold text-brand-orange uppercase rounded">
               Secure Session
             </span>
@@ -122,7 +156,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Dashboard Content area */}
-        <main className="p-8 flex-1 bg-brand-dark">{children}</main>
+        <main className="p-8 flex-1 bg-slate-50 dark:bg-brand-dark transition-colors duration-300">{children}</main>
       </div>
     </div>
   );
