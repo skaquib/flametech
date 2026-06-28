@@ -43,9 +43,9 @@ export default function ContactPage() {
     },
     {
       icon: <MapPin className="w-5 h-5 text-brand-orange" />,
-      title: "Registered Plant Address",
-      details: "Gandhinagar, Gujarat",
-      desc: "Plot No. 47, G.I.D.C Industrial Area, Sector 26, Gandhinagar - 382026",
+      title: "Registered Mumbai Office",
+      details: "Mahim, Mumbai",
+      desc: "Shop No. 9, Ground Floor, Paradise Apts., 15 Wanja Wadi, Mahim (W), Mumbai - 400 016",
     },
   ];
 

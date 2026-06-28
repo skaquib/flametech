@@ -29,7 +29,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-3 pt-2">
               <span className="px-2 py-1 bg-slate-200 dark:bg-brand-slate/30 border border-slate-300 dark:border-brand-slate/50 text-[10px] uppercase font-bold text-slate-700 dark:text-slate-300 rounded tracking-wider">
-                ISO 9001:2015
+                ISO 9001:2008
               </span>
               <span className="px-2 py-1 bg-slate-200 dark:bg-brand-slate/30 border border-slate-300 dark:border-brand-slate/50 text-[10px] uppercase font-bold text-slate-700 dark:text-slate-300 rounded tracking-wider">
                 CE Certified
@@ -104,8 +104,8 @@ export default function Footer() {
             <ul className="space-y-3.5 text-sm">
               <li className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-brand-orange shrink-0 mt-0.5" />
-                <span className="leading-relaxed text-slate-700 dark:text-slate-300">
-                  Plot No. 47, FlameTech Engineering, G.I.D.C Industrial Area, Sector 26, Gandhinagar, Gujarat - 382026
+                <span className="leading-relaxed text-slate-700 dark:text-slate-300 text-xs">
+                  Shop No. 9, Ground Floor, Paradise Apts., 15 Wanja Wadi, Mahim (W), Mumbai - 400 016
                 </span>
               </li>
               <li className="flex items-center space-x-3">
@@ -138,6 +138,7 @@ export default function Footer() {
           <p>© {currentYear} FlameTech Engineering. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 sm:mt-0">
             <Link href="/privacy" className="hover:text-slate-700 dark:hover:text-slate-300">Privacy Policy</Link>
+            <Link href="/cookies" className="hover:text-slate-700 dark:hover:text-slate-300">Cookies Policy</Link>
             <Link href="/terms" className="hover:text-slate-700 dark:hover:text-slate-300">Terms of Service</Link>
           </div>
         </div>

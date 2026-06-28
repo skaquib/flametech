@@ -7,10 +7,10 @@ import { Flame, Settings, ShieldCheck, Award, ArrowRight, CheckCircle2 } from "l
 
 export default function AboutPage() {
   const companyMilestones = [
-    { year: "2014", title: "Company Founded", desc: "FlameTech started burner manufacturing operations in Gandhinagar, Gujarat with custom gas burner assemblies." },
-    { year: "2017", title: "GIDC Facility Expansion", desc: "Expanded manufacturing plant capacity to produce standardized industrial burner series (FT-03 to FT-25)." },
-    { year: "2020", title: "Control Panel Division", desc: "Launched dedicated microprocessor control panels division to provide complete safety and integration." },
-    { year: "2023", title: "470+ Spares Portfolio", desc: "Standardized spare parts supply chain to ship online orders across industrial zones within 24 hours." },
+    { year: "2002", title: "Operations Commenced", desc: "FlameTech started operations as a specialized industrial burner service and installation provider in Mumbai." },
+    { year: "2011", title: "Corporate Registration", desc: "Formally registered in Mumbai as a licensed manufacturing entity for all kinds of industrial burners and hotel kitchen equipment." },
+    { year: "2014", title: "Proprietary Line Launch", desc: "Launched proprietary B2B burner designs (FT-03 to FT-25 series) and set up local spare parts distribution networks." },
+    { year: "2023", title: "ISO 9001:2008 & Pan-India SLA", desc: "Achieved ISO 9001:2008 certification and expanded standard AMC coverage to 2,500+ active burner installations all over India." },
   ];
 
   const values = [
@@ -39,11 +39,11 @@ export default function AboutPage() {
         <section className="text-center max-w-3xl mx-auto space-y-4 mb-20">
           <div className="inline-flex items-center space-x-2 px-3 py-1 bg-brand-orange/10 border border-brand-orange/30 rounded-full text-brand-orange text-xs font-semibold uppercase tracking-wider">
             <Flame className="w-3.5 h-3.5" />
-            <span>Since 2014</span>
+            <span>Since 2002</span>
           </div>
           <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white sm:text-5xl">Engineering Next-Gen Thermal Systems</h1>
           <p className="text-slate-650 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
-            FlameTech Engineering manufactures high-efficiency industrial burners, customized automation control panels, and premium spare parts for metallurgy, ceramics, baking, and chemical processing kilns.
+            FlameTech Engineering manufactures high-efficiency industrial burners, customized automation control panels, hotel kitchen equipment, and premium spare parts for metallurgy, ceramics, baking, and chemical processing kilns.
           </p>
         </section>
 
@@ -52,7 +52,7 @@ export default function AboutPage() {
           <div className="lg:col-span-6 space-y-6">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Our Quest for Thermal Efficiency</h2>
             <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-              For over a decade, we have partnered with industrial manufacturing plants, process designers, and utility managers across India and global regions to minimize combustion emissions and fuel consumption costs.
+              Since 2002, we have partnered with industrial manufacturing plants, process designers, and utility managers across India to minimize combustion emissions and fuel consumption costs.
             </p>
             <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
               By combining high-temp Kanthal electrodes, Class A solenoid valves, and micro-controlled safeties, we provide heating systems that stand up to the most demanding thermal processes up to 1400°C.
@@ -71,7 +71,7 @@ export default function AboutPage() {
 
           <div className="lg:col-span-6 bg-white dark:bg-[#0a1128]/40 border border-slate-200 dark:border-brand-slate/30 p-8 rounded-2xl relative shadow-md">
             <div className="absolute top-4 right-4 bg-brand-orange text-white text-[9px] uppercase font-bold tracking-widest px-3 py-1 rounded shadow-sm">
-               गांधीनगर, गुजरात
+               मुंबई, महाराष्ट्र
             </div>
             
             <div className="space-y-6">
@@ -83,7 +83,7 @@ export default function AboutPage() {
               <ul className="space-y-3.5 text-xs text-slate-700 dark:text-slate-350">
                 <li className="flex items-start space-x-2.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-orange shrink-0 mt-1.5"></span>
-                  <span><strong>Gandhinagar Plant:</strong> Core combustion simulation, sheet bending, control box wiring, and full nozzle calibration tracks.</span>
+                  <span><strong>Mumbai Plant:</strong> Core combustion simulation, sheet bending, control box wiring, and full nozzle calibration tracks.</span>
                 </li>
                 <li className="flex items-start space-x-2.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-brand-orange shrink-0 mt-1.5"></span>
@@ -94,6 +94,49 @@ export default function AboutPage() {
                   <span><strong>SLA Networks:</strong> Mobile engineering teams with complete calibration analyzer kits stationed for rapid maintenance visits.</span>
                 </li>
               </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Core Metrics */}
+        <section className="mb-24 py-12 px-6 bg-slate-100 dark:bg-[#0a1128]/40 border border-slate-200 dark:border-brand-slate/20 rounded-2xl">
+          <div className="text-center max-w-2xl mx-auto space-y-3 mb-12">
+            <h2 className="text-xs uppercase font-extrabold text-brand-orange tracking-widest">Track Record</h2>
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">FlameTech by the Numbers</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Serving manufacturing plants, mills, commercial bakeries, and hotel kitchens all over India.</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="space-y-1">
+              <span className="block text-3xl sm:text-4xl font-black text-brand-orange font-mono">2,500+</span>
+              <span className="block text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Running Burners (Mumbai)</span>
+            </div>
+            <div className="space-y-1">
+              <span className="block text-3xl sm:text-4xl font-black text-brand-orange font-mono">5,000+</span>
+              <span className="block text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Powder Coating Ovens</span>
+            </div>
+            <div className="space-y-1">
+              <span className="block text-3xl sm:text-4xl font-black text-brand-orange font-mono">4,000+</span>
+              <span className="block text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Bakery Installations</span>
+            </div>
+            <div className="space-y-1">
+              <span className="block text-3xl sm:text-4xl font-black text-brand-orange font-mono">1,000+</span>
+              <span className="block text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Hotel Kitchens Served</span>
+            </div>
+            <div className="space-y-1">
+              <span className="block text-3xl sm:text-4xl font-black text-brand-orange font-mono">300+</span>
+              <span className="block text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Furnaces (Melting & Crematory)</span>
+            </div>
+            <div className="space-y-1">
+              <span className="block text-3xl sm:text-4xl font-black text-brand-orange font-mono">200+</span>
+              <span className="block text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Steam Boilers</span>
+            </div>
+            <div className="space-y-1">
+              <span className="block text-3xl sm:text-4xl font-black text-brand-orange font-mono">200+</span>
+              <span className="block text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Textile & Laundry Mills</span>
+            </div>
+            <div className="space-y-1">
+              <span className="block text-3xl sm:text-4xl font-black text-brand-orange font-mono">100</span>
+              <span className="block text-[10px] font-bold text-slate-700 dark:text-slate-350 uppercase tracking-wider">Dal Mill Installations</span>
             </div>
           </div>
         </section>
