@@ -73,13 +73,16 @@ async function main() {
   console.log("Industries created.");
 
   // 4. Users
-  const adminHash = await bcrypt.hash("AdminFlameTech123!", 10);
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@flametech.com";
+  const adminPassword = process.env.ADMIN_PASSWORD || "AdminFlameTech123!";
+  
+  const adminHash = await bcrypt.hash(adminPassword, 10);
   const customerHash = await bcrypt.hash("Customer123!", 10);
 
   await prisma.user.create({
     data: {
       name: "FlameTech Admin",
-      email: "admin@flametech.com",
+      email: adminEmail,
       phone: "+919768417740",
       passwordHash: adminHash,
       role: Role.ADMIN,

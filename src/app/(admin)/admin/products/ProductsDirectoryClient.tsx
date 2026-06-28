@@ -176,13 +176,13 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                           </svg>
                         </Link>
-                        <button
-                          onClick={() => alert(`Edit page for ${p.name} (Simulated)`)}
+                        <Link
+                          href={`/admin/products/${p.id}`}
                           className="p-2 bg-brand-slate border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white rounded-md"
                           title="Edit details"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
-                        </button>
+                        </Link>
                       </div>
                     </td>
 
