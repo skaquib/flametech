@@ -94,6 +94,22 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     e.preventDefault();
     setQuoteLoading(true);
     
+    // Format WhatsApp details
+    const phone = "919768417740";
+    const text = `Hello FlameTech Engineering! I would like to request a quote for *${product.name}* (Code: *${product.itemCode || "N/A"}*).
+
+*My Details:*
+- Name: ${quoteForm.name}
+- Company: ${quoteForm.company || "N/A"}
+- Phone: ${quoteForm.phone}
+- Email: ${quoteForm.email || "N/A"}
+- Requested Qty: ${quoteForm.quantity}
+
+*Message / Requirements:*
+${quoteForm.message || "N/A"}`;
+
+    const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+
     try {
       const response = await fetch("/api/quotes", {
         method: "POST",
@@ -110,14 +126,16 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
       if (response.ok) {
         setQuoteSubmitted(true);
+        window.open(waUrl, "_blank");
       } else {
-        // Fallback for offline mode or connection issues
-        console.warn("API error, simulating local success");
+        console.warn("API error, triggering WhatsApp fallback");
         setQuoteSubmitted(true);
+        window.open(waUrl, "_blank");
       }
     } catch (err) {
-      console.warn("Fetch failed, simulating local success");
+      console.warn("Fetch failed, triggering WhatsApp fallback");
       setQuoteSubmitted(true);
+      window.open(waUrl, "_blank");
     } finally {
       setQuoteLoading(false);
     }

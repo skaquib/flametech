@@ -9,6 +9,9 @@ import { ShoppingCart, User, Menu, X, Flame, ShieldAlert, FileText, Sun, Moon } 
 
 export default function Navbar() {
   const pathname = usePathname();
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);

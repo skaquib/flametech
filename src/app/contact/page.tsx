@@ -21,11 +21,26 @@ export default function ContactPage() {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate API query/contact post
+    const phone = "919768417740";
+    const text = `Hello FlameTech Engineering! I have a general B2B inquiry:
+
+*My Details:*
+- Name: ${form.name}
+- Company: ${form.company || "N/A"}
+- Phone: ${form.phone}
+- Email: ${form.email || "N/A"}
+- Subject: ${form.subject}
+
+*Project / Technical Details:*
+${form.message}`;
+
+    const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
-    }, 1500);
+      window.open(waUrl, "_blank");
+    }, 1200);
   };
 
   const contactMethods = [
