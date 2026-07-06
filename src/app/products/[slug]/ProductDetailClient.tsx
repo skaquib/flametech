@@ -83,7 +83,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
       slug: product.slug,
       itemCode: product.itemCode,
       price: product.price || 0,
-      image: product.image || `/images/${product.slug}.jpg`,
+      image: product.image ?? null,
       taxRate: product.taxRate,
     }, quantity);
 
@@ -157,18 +157,20 @@ ${quoteForm.message || "N/A"}`;
 
         {/* Product Image Showcase */}
         <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center group shadow-md">
-          <img
-            src={product.image || `/images/${product.slug}.jpg`}
-            alt={product.name}
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-              if (fallback) fallback.style.display = 'flex';
-            }}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-          />
-          {/* Fallback Icon */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none hidden">
+          {product.image ? (
+            <img
+              src={product.image}
+              alt={product.name}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
+            />
+          ) : null}
+          {/* Fallback Icon — shown directly when there's no image on file, or if the real image fails to load */}
+          <div className={`absolute inset-0 items-center justify-center pointer-events-none ${product.image ? "hidden" : "flex"}`}>
             {isEquipment ? (
               <Flame className="w-16 h-16 text-brand-orange/20" />
             ) : (

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
-import { Search, Flame, Settings, ShoppingCart, Check, Info } from "lucide-react";
+import { Search, Flame, Settings, ShoppingCart, Check, Info, SlidersHorizontal, ChevronDown } from "lucide-react";
 
 interface Product {
   id: string;
@@ -43,6 +43,9 @@ export default function ProductListClient({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedType, setSelectedType] = useState("all"); // 'all' | 'EQUIPMENT' | 'PART'
   const [addedItemSlug, setAddedItemSlug] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const activeFilterCount = (selectedType !== "all" ? 1 : 0) + (selectedCategory !== "all" ? 1 : 0) + (searchTerm ? 1 : 0);
 
   const addItem = useCartStore((state) => state.addItem);
 
@@ -69,7 +72,7 @@ export default function ProductListClient({
       slug: product.slug,
       itemCode: product.itemCode,
       price: product.price || 0,
-      image: product.image || `/images/${product.slug}.jpg`,
+      image: product.image ?? null,
       taxRate: product.taxRate,
     });
 
@@ -83,9 +86,26 @@ export default function ProductListClient({
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
       {/* Sidebar Controls */}
       <div className="lg:col-span-1 space-y-6">
-        <div className="bg-white dark:bg-brand-navy/70 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl space-y-6 text-left backdrop-blur-md shadow-sm">
-          <h3 className="text-slate-900 dark:text-white font-bold text-base border-b border-slate-200 dark:border-brand-slate/40 pb-3">Filters</h3>
-          
+        {/* Mobile filter toggle */}
+        <button
+          onClick={() => setFiltersOpen((v) => !v)}
+          className="lg:hidden w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-brand-navy/70 border border-slate-200 dark:border-brand-slate/40 rounded-xl text-slate-900 dark:text-white font-bold text-sm shadow-sm"
+        >
+          <span className="flex items-center gap-2">
+            <SlidersHorizontal className="w-4 h-4 text-brand-orange" />
+            Filters
+            {activeFilterCount > 0 && (
+              <span className="bg-brand-orange text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </span>
+          <ChevronDown className={`w-4 h-4 transition-transform ${filtersOpen ? "rotate-180" : ""}`} />
+        </button>
+
+        <div className={`${filtersOpen ? "block" : "hidden"} lg:block bg-white dark:bg-brand-navy/70 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl space-y-6 text-left backdrop-blur-md shadow-sm`}>
+          <h3 className="hidden lg:block text-slate-900 dark:text-white font-bold text-base border-b border-slate-200 dark:border-brand-slate/40 pb-3">Filters</h3>
+
           {/* Search Box */}
           <div className="space-y-2">
             <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Search Catalog</label>
@@ -181,19 +201,21 @@ export default function ProductListClient({
                       {p.category.name}
                     </div>
                     
-                    <img
-                      src={p.image || `/images/${p.slug}.jpg`}
-                      alt={p.name}
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                        if (fallback) fallback.style.display = 'flex';
-                      }}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
+                    {p.image ? (
+                      <img
+                        src={p.image}
+                        alt={p.name}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    ) : null}
 
-                    {/* Backup fallback icon */}
-                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none hidden">
+                    {/* Fallback icon — shown directly when there's no image on file, or if the real image fails to load */}
+                    <div className={`absolute inset-0 items-center justify-center pointer-events-none ${p.image ? "hidden" : "flex"}`}>
                       {isEquipment ? (
                         <Flame className="w-10 h-10 text-brand-orange/20" />
                       ) : (

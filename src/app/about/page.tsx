@@ -8,9 +8,14 @@ import { Flame, Settings, ShieldCheck, Award, ArrowRight, CheckCircle2 } from "l
 export default function AboutPage() {
   const companyMilestones = [
     { year: "2002", title: "Operations Commenced", desc: "FlameTech started operations as a specialized industrial burner service and installation provider in Mumbai." },
+    { year: "2009", title: "Quality Certification", desc: "Achieved ISO 9001:2008 certification, formalizing quality control across manufacturing." },
     { year: "2011", title: "Corporate Registration", desc: "Formally registered in Mumbai as a licensed manufacturing entity for all kinds of industrial burners and hotel kitchen equipment." },
     { year: "2014", title: "Proprietary Line Launch", desc: "Launched proprietary B2B burner designs (FT-03 to FT-25 series) and set up local spare parts distribution networks." },
-    { year: "2023", title: "ISO 9001:2008 & Pan-India SLA", desc: "Achieved ISO 9001:2008 certification and expanded standard AMC coverage to 2,500+ active burner installations all over India." },
+    { year: "2016", title: "CE Certification & Spares Expansion", desc: "Achieved CE certification for export-readiness and grew in-house spares stock to support faster service turnaround." },
+    { year: "2019", title: "Globally Exported", desc: "Began exporting burners and components internationally, reaching customers across 14+ countries." },
+    { year: "2021", title: "Expanded & Fuel-Efficient Burner", desc: "Expanded operations and introduced a more gas-efficient burner design to reduce customer fuel consumption." },
+    { year: "2023", title: "AMC Program Scaled Nationwide", desc: "Rolled out the Annual Maintenance Contract program at scale, extending bi-monthly inspection and emergency service coverage across India." },
+    { year: "2025", title: "New Tech in Burners", desc: "Introduced new burner technology upgrades, continuing to improve efficiency and reliability." },
   ];
 
   const values = [

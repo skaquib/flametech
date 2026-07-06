@@ -15,7 +15,7 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="bg-slate-100 dark:bg-brand-navy border-t border-slate-200 dark:border-brand-slate/40 text-slate-600 dark:text-slate-400 mt-auto pt-16 pb-8">
+      <footer className="bg-slate-100 dark:bg-brand-navy border-t border-slate-200 dark:border-brand-slate/40 text-slate-600 dark:text-slate-400 mt-auto pt-16 pb-28 sm:pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
             
@@ -160,11 +160,11 @@ export default function Footer() {
         href="https://wa.me/919768417740?text=Hello%20FlameTech%20Engineering,%20I%20have%20an%20inquiry."
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-8 right-8 z-50 flex items-center justify-center bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-white p-3.5 rounded-full shadow-2xl group cursor-pointer"
+        className="fixed bottom-5 right-4 sm:bottom-8 sm:right-8 z-50 flex items-center justify-center bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-white p-3 sm:p-3.5 rounded-full shadow-2xl group cursor-pointer"
         title="Chat with our Engineers on WhatsApp"
       >
         <svg
-          className="w-7 h-7 fill-current"
+          className="w-6 h-6 sm:w-7 sm:h-7 fill-current"
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
         >

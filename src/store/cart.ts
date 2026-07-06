@@ -7,7 +7,7 @@ export interface CartItem {
   slug: string;
   itemCode: string | null;
   price: number; // in INR
-  image: string;
+  image: string | null;
   quantity: number;
   taxRate: string | null; // e.g. "18%"
 }

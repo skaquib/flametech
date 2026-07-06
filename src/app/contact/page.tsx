@@ -53,7 +53,7 @@ ${form.message}`;
     {
       icon: <Mail className="w-5 h-5 text-brand-orange" />,
       title: "Sales & Billing Email",
-      details: "billing@flametech.com",
+      details: "info@flametech.com",
       desc: "Send formal RFP specifications, quotation forms, or purchase orders (PO).",
     },
     {

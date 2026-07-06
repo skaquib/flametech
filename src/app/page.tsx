@@ -9,12 +9,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function Home() {
   const [selectedBurner, setSelectedBurner] = useState("ft-03");
-  const [systemTime, setSystemTime] = useState("");
-  const [isMounted, setIsMounted] = useState(false);
 
-  // 360 Explorer state
+  // Model Explorer state
   const [explorerTab, setExplorerTab] = useState("ft-3");
-  const [rotationDegrees, setRotationDegrees] = useState(0);
+  const [activeHotspotIndex, setActiveHotspotIndex] = useState(0);
 
   const explorerProducts = [
     {
@@ -152,9 +150,7 @@ export default function Home() {
   ];
 
   const activeExplorer = explorerProducts.find((p) => p.id === explorerTab) || explorerProducts[0];
-  const activeHotspot = activeExplorer.hotspots.find(
-    (h) => rotationDegrees >= h.min && rotationDegrees <= h.max
-  ) || activeExplorer.hotspots[0];
+  const activeHotspot = activeExplorer.hotspots[activeHotspotIndex] || activeExplorer.hotspots[0];
 
   const containerRef = useRef<HTMLDivElement>(null);
   const realBurnerRef = useRef<HTMLDivElement>(null);
@@ -167,17 +163,10 @@ export default function Home() {
   const spot3Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setIsMounted(true);
-    // Set initial time immediately on mount
-    setSystemTime(new Date().toISOString().replace("T", " ").substring(0, 19));
-    // Keep dynamic system clock ticking
-    const timer = setInterval(() => {
-      setSystemTime(new Date().toISOString().replace("T", " ").substring(0, 19));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+    // Desktop-only scroll-scrubbed showcase — mobile gets a static hero instead
+    const mq = window.matchMedia("(min-width: 1024px)");
+    if (!mq.matches) return;
 
-  useEffect(() => {
     // Initialize GSAP ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
 
@@ -347,12 +336,71 @@ export default function Home() {
     <div className="relative pt-20">
       {/* Interactive Blueprint Hero Track */}
       {/* Interactive Blueprint Hero Track */}
-      <section 
-        ref={containerRef} 
+      <section
+        ref={containerRef}
         className="relative w-full overflow-visible bg-slate-50 dark:bg-[#060b13] text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/5 select-none lg:h-[180vh] h-auto"
       >
-        {/* Sticky Viewport */}
-        <div className="relative lg:sticky lg:top-0 lg:h-screen h-auto w-full flex flex-col justify-between overflow-hidden engineering-grid pt-24 pb-8 z-20">
+        {/* Mobile Hero (static, no scroll animation) */}
+        <div className="lg:hidden engineering-grid pt-8 pb-12 px-4 sm:px-6 relative">
+          <div className="absolute inset-0 cinematic-glow z-0 pointer-events-none"></div>
+          <div className="relative z-10 space-y-6 text-left">
+            <div className="inline-flex items-center space-x-2 text-[10px] tracking-[0.2em] uppercase font-bold text-brand-orange">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-ping"></span>
+              <span>Diagnostics active</span>
+            </div>
+            <h1 className="text-3xl font-black tracking-tight leading-[1.05] text-slate-900 dark:text-white uppercase font-sans">
+              The Next <br />
+              Generation of <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange via-orange-400 to-brand-amber">
+                Combustion.
+              </span>
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed max-w-sm">
+              Introducing the FT Series. Modular high-efficiency burners engineered for heavy-industry process kilns and steam boilers. Designed to achieve up to 15% fuel reduction.
+            </p>
+
+            <div className="w-full flex items-center justify-center py-4">
+              <img
+                src="/images/hero-burner.png"
+                alt="FlameTech FT-25 High-Efficiency Burner"
+                className="max-h-[220px] w-auto object-contain filter drop-shadow-[0_25px_60px_rgba(242,100,25,0.15)]"
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/products"
+                className="inline-block px-5 py-3 bg-brand-orange hover:bg-brand-orange/90 text-white font-bold rounded text-xs tracking-wider uppercase transition-all shadow-lg shadow-brand-orange/20"
+              >
+                B2B Catalog
+              </Link>
+              <Link
+                href="/services/amc"
+                className="inline-block px-5 py-3 bg-slate-200 dark:bg-slate-900 border border-slate-300 dark:border-slate-800 hover:bg-slate-300 dark:hover:bg-slate-800 text-slate-800 dark:text-white font-bold rounded text-xs tracking-wider uppercase transition-all"
+              >
+                SLA Service
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 border-t border-slate-200 dark:border-white/5 pt-6 mt-2 font-mono">
+              <div>
+                <span className="block text-xl font-bold text-slate-900 dark:text-white">470+</span>
+                <span className="block text-[8px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">Spares In Stock</span>
+              </div>
+              <div>
+                <span className="block text-xl font-bold text-slate-900 dark:text-white">6</span>
+                <span className="block text-[8px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">Burner Ranges</span>
+              </div>
+              <div>
+                <span className="block text-xl font-bold text-slate-900 dark:text-white">14+</span>
+                <span className="block text-[8px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">Global Regions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sticky Viewport (desktop scroll-scrubbed showcase) */}
+        <div className="hidden lg:sticky lg:top-0 lg:h-screen lg:flex flex-col justify-between overflow-hidden engineering-grid pt-24 pb-8 z-20 relative w-full">
           {/* Cinematic backlighting glow */}
           <div className="absolute inset-0 cinematic-glow z-0 pointer-events-none"></div>
 
@@ -361,23 +409,6 @@ export default function Home() {
           <div className="absolute inset-x-0 bottom-0 h-[1px] bg-slate-200 dark:bg-white/5 z-0"></div>
           <div className="absolute inset-y-0 left-[20%] w-[1px] bg-slate-200 dark:bg-white/5 z-0 hidden lg:block"></div>
           <div className="absolute inset-y-0 right-[25%] w-[1px] bg-slate-200 dark:bg-white/5 z-0 hidden lg:block"></div>
-
-          {/* Tech Stamps */}
-          <div className="absolute top-24 left-6 text-[9px] font-mono tracking-widest text-slate-400 dark:text-slate-500 uppercase select-none z-10 hidden sm:block">
-            [ FT_SYS_TRACKER: 0.1.0-REV4 ]
-          </div>
-          <div
-            suppressHydrationWarning
-            className="absolute top-24 right-6 text-[9px] font-mono tracking-widest text-slate-400 dark:text-slate-500 uppercase select-none z-10 hidden sm:block"
-          >
-            {isMounted ? `[ SYS_TIME: ${systemTime} ]` : "[ SYS_TIME: -- ]"}
-          </div>
-          <div className="absolute bottom-6 left-6 text-[9px] font-mono tracking-widest text-slate-400 dark:text-slate-500 uppercase select-none z-10 hidden sm:block">
-            [ GPS: 23°02'N // 72°35'E ]
-          </div>
-          <div className="absolute bottom-6 right-6 text-[9px] font-mono tracking-widest text-slate-400 dark:text-slate-500 uppercase select-none z-10 hidden sm:block">
-            [ EST_SEEDS: NOMINAL ]
-          </div>
 
           <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center flex-1">
             {/* Left Column: Premium Technical Message */}
@@ -670,16 +701,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 360° Interactive Product Explorer */}
+      {/* Product & Applications Explorer */}
       <section className="bg-slate-100 dark:bg-brand-navy/35 py-24 border-b border-slate-200 dark:border-brand-slate/40 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-16">
-            <h2 className="text-xs uppercase font-extrabold text-brand-orange tracking-widest">Interactive Inspection</h2>
-            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">360° Product &amp; Applications Explorer</h3>
+            <h2 className="text-xs uppercase font-extrabold text-brand-orange tracking-widest">Compare Models</h2>
+            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Burner &amp; Panel Model Explorer</h3>
             <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
-              Select any burner or panel below. Rotate the slider to inspect key components — see exactly where each product is used, who deploys it, and what specifications make it the industrial standard.
+              Select any burner or panel below to see its specifications, key components, and where it's typically deployed.
             </p>
           </div>
 
@@ -688,7 +719,7 @@ export default function Home() {
             {explorerProducts.map((p) => (
               <button
                 key={p.id}
-                onClick={() => { setExplorerTab(p.id); setRotationDegrees(0); }}
+                onClick={() => { setExplorerTab(p.id); setActiveHotspotIndex(0); }}
                 className={`shrink-0 flex flex-col items-center gap-1 px-4 py-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                   explorerTab === p.id
                     ? "bg-brand-orange text-white border-brand-orange shadow-md shadow-brand-orange/20"
@@ -742,65 +773,47 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Center: 360 Rotation Simulation View */}
+            {/* Center: Product photo + key components */}
             <div className="lg:col-span-6 flex flex-col justify-center items-center bg-white dark:bg-[#060b13]/55 border border-slate-200 dark:border-brand-slate/35 p-8 rounded-2xl shadow-lg relative min-h-[440px]">
-              
-              {/* HUD Details */}
-              <div className="absolute top-4 left-4 font-mono text-[9px] text-slate-400 dark:text-slate-500 space-y-0.5 select-none text-left">
-                <div>[ SCAN_SECTOR: ACTIVE ]</div>
-                <div>[ Y_ANGLE: {rotationDegrees}° ]</div>
-                <div>[ MODEL: {activeExplorer.badge} ]</div>
-              </div>
+
               <div className="absolute top-4 right-4 font-mono text-[9px] text-slate-400 dark:text-slate-500 select-none text-right">
-                <div>[ OUTPUT: {activeExplorer.output} ]</div>
+                <div>{activeExplorer.badge} · {activeExplorer.output}</div>
               </div>
 
-              {/* Product Image - rotatable */}
-              <div className="relative w-full h-[260px] flex items-center justify-center overflow-visible select-none mt-4">
-                <div
-                  className="w-full h-full flex items-center justify-center transition-transform duration-100 ease-out"
-                  style={{ transform: `perspective(1000px) rotateY(${rotationDegrees * 0.3}deg)` }}
-                >
-                  <img
-                    src={activeExplorer.image}
-                    alt={activeExplorer.name}
-                    onError={(e) => { e.currentTarget.src = "/images/hero-burner.png"; }}
-                    className="max-h-[240px] w-auto object-contain filter drop-shadow-[0_20px_50px_rgba(242,100,25,0.18)] transition-all duration-300"
-                  />
-                </div>
-                {/* Hotspot glow ring */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-48 h-48 rounded-full border border-brand-orange/10 animate-pulse" style={{ animationDuration: "3s" }} />
-                </div>
-              </div>
-
-              {/* Angle Slider controller */}
-              <div className="w-full space-y-2 mt-6">
-                <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                  <span>Drag to Inspect</span>
-                  <span className="text-brand-orange font-mono font-bold">{rotationDegrees}° View</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="360"
-                  value={rotationDegrees}
-                  onChange={(e) => setRotationDegrees(parseInt(e.target.value))}
-                  className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-orange"
+              {/* Product Image */}
+              <div className="relative w-full h-[260px] flex items-center justify-center overflow-visible select-none mt-4 group">
+                <img
+                  src={activeExplorer.image}
+                  alt={activeExplorer.name}
+                  onError={(e) => { e.currentTarget.src = "/images/hero-burner.png"; }}
+                  className="max-h-[240px] w-auto object-contain filter drop-shadow-[0_20px_50px_rgba(242,100,25,0.18)] transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="flex justify-between text-[9px] text-slate-400 font-mono">
-                  <span>0° Front</span>
-                  <span>90° Side</span>
-                  <span>180° Rear</span>
-                  <span>270° Side</span>
-                  <span>360° Front</span>
+              </div>
+
+              {/* Key components — pick a component to read about it */}
+              <div className="w-full space-y-2 mt-6">
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Key Components</span>
+                <div className="flex flex-wrap gap-2">
+                  {activeExplorer.hotspots.map((h, idx) => (
+                    <button
+                      key={h.label}
+                      onClick={() => setActiveHotspotIndex(idx)}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all cursor-pointer border ${
+                        activeHotspotIndex === idx
+                          ? "bg-brand-orange text-white border-brand-orange"
+                          : "bg-slate-100 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-brand-orange/40"
+                      }`}
+                    >
+                      {h.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              {/* Active hotspot description bar */}
+              {/* Active component description bar */}
               <div className="w-full mt-5 p-4 bg-brand-orange/5 border border-brand-orange/20 rounded-xl">
                 <span className="text-[9px] font-bold text-brand-orange uppercase tracking-wider block mb-1">
-                  [SCAN] {activeHotspot.label}
+                  {activeHotspot.label}
                 </span>
                 <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">{activeHotspot.desc}</p>
               </div>
@@ -831,21 +844,20 @@ export default function Home() {
                 <p className="text-slate-600 dark:text-slate-400 text-xs leading-relaxed">{activeExplorer.usedBy}</p>
               </div>
 
-              {/* Component Hotspot indicators */}
+              {/* Component indicators */}
               <div className="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-brand-slate/30 p-5 rounded-xl shadow-sm space-y-2">
                 <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Component Zones</span>
                 {activeExplorer.hotspots.map((h, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setRotationDegrees(h.min + 10)}
+                    onClick={() => setActiveHotspotIndex(idx)}
                     className={`w-full text-left p-2 rounded-lg text-xs transition-all cursor-pointer ${
-                      activeHotspot.label === h.label
+                      activeHotspotIndex === idx
                         ? "bg-brand-orange/10 border border-brand-orange/30 text-brand-orange"
                         : "hover:bg-slate-50 dark:hover:bg-slate-800/40 text-slate-600 dark:text-slate-400 border border-transparent"
                     }`}
                   >
                     <span className="font-bold block">{h.label}</span>
-                    <span className="text-[9px] opacity-70">{h.min}° – {h.max}° view range</span>
                   </button>
                 ))}
               </div>

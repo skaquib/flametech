@@ -196,6 +196,8 @@ export default function Navbar() {
             {/* Hamburger menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
               className="p-2 rounded-md text-slate-600 dark:text-slate-300 hover:text-brand-orange dark:hover:text-white focus:outline-none"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}

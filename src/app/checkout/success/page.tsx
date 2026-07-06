@@ -135,7 +135,7 @@ function SuccessContent() {
             <div><span className="font-bold text-slate-500">Invoice No:</span> <span className="font-extrabold text-slate-900">{orderNumber.replace("ORD", "INV")}</span></div>
             <div><span className="font-bold text-slate-500">Order Ref:</span> {orderNumber}</div>
             <div><span className="font-bold text-slate-500">Date:</span> {new Date().toLocaleDateString()}</div>
-            <div><span className="font-bold text-slate-500">GSTIN:</span> <span className="font-black text-brand-orange">24AAACF9988G1ZX</span></div>
+            <div><span className="font-bold text-slate-500">GSTIN:</span> <span className="font-black text-brand-orange">27AEOPT1704Q1ZS</span></div>
           </div>
         </div>
 
@@ -149,10 +149,10 @@ function SuccessContent() {
             </h4>
             <div className="leading-relaxed text-slate-600">
               <strong className="text-slate-800">FlameTech Engineering Office</strong><br />
-              Plot No. 47, G.I.D.C Industrial Area,<br />
-              Sector 26, Gandhinagar, Gujarat - 382026<br />
-              State Code: 24 (Gujarat)<br />
-              Contact: +91 97684 17740 | billing@flametech.com
+              Shop No. 9, Ground Floor, Paradise Apts.,<br />
+              15 Wanja Wadi, Mahim (W), Mumbai, Maharashtra - 400 016<br />
+              State Code: 27 (Maharashtra)<br />
+              Contact: +91 97684 17740 | info@flametech.com
             </div>
           </div>
 
@@ -167,7 +167,7 @@ function SuccessContent() {
               {buyerCompany && <span className="block text-[11px] text-slate-500 font-semibold">Attn: {buyerName}</span>}
               {addressLine1}, {addressLine2 ? `${addressLine2}, ` : ""}<br />
               {city}, {state} - {pincode}<br />
-              State Code: {state.toLowerCase().includes("gujarat") ? "24 (Local)" : "Inter-State"}<br />
+              State Code: {state.toLowerCase().includes("maharashtra") ? "27 (Local)" : "Inter-State"}<br />
               GSTIN: <span className="font-bold text-slate-800">{buyerGstin || "N/A (Consumer Retail)"}</span>
             </div>
           </div>
@@ -236,7 +236,7 @@ function SuccessContent() {
             <strong className="text-slate-700 block uppercase tracking-wide">Declaration & Terms:</strong>
             <p>
               1. Goods once sold will not be taken back or exchanged.<br />
-              2. Disputes, if any, shall be subject to Gandhinagar jurisdiction.<br />
+              2. Disputes, if any, shall be subject to Mumbai jurisdiction.<br />
               3. We declare that this invoice shows the actual price of the goods described and that all particulars are true and correct.
             </p>
           </div>

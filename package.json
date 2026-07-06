@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate",
+    "import:vyapar": "tsx prisma/import-vyapar.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
