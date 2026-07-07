@@ -1,13 +1,14 @@
 import React from "react";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
-import { ClipboardList, ShoppingBag, ShieldAlert, BadgePlus, ExternalLink, ArrowUpRight } from "lucide-react";
+import { ClipboardList, ShoppingBag, ShieldAlert, BadgePlus, ExternalLink, ArrowUpRight, Eye } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 async function getDashboardData() {
   try {
     const totalQuotes = await prisma.quoteRequest.count();
+    const newLeadsCount = await prisma.quoteRequest.count({ where: { status: "NEW" } });
     const activeOrders = await prisma.order.count({
       where: { status: { notIn: ["DELIVERED", "CANCELLED"] } },
     });
@@ -36,21 +37,30 @@ async function getDashboardData() {
       include: { user: true },
     });
 
+    const recentViews = await prisma.productView.findMany({
+      take: 8,
+      orderBy: { createdAt: "desc" },
+      include: { product: true, user: true },
+    });
+
     return {
       metrics: {
         totalQuotes,
+        newLeadsCount,
         activeOrders,
         totalRevenue,
         lowStockCount,
       },
       recentQuotes,
       recentOrders,
+      recentViews,
     };
   } catch (error) {
     console.error("Dashboard DB fetch error, falling back to mock metrics");
     return {
       metrics: {
         totalQuotes: 14,
+        newLeadsCount: 4,
         activeOrders: 6,
         totalRevenue: 245000,
         lowStockCount: 3,
@@ -97,12 +107,13 @@ async function getDashboardData() {
           user: { name: "B2B Client Ltd" },
         },
       ],
+      recentViews: [],
     };
   }
 }
 
 export default async function AdminDashboardPage() {
-  const { metrics, recentQuotes, recentOrders } = await getDashboardData();
+  const { metrics, recentQuotes, recentOrders, recentViews } = await getDashboardData();
 
   return (
     <div className="space-y-8 text-left">
@@ -113,7 +124,19 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Metrics Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        {/* New / Unactioned Leads */}
+        <div className="bg-[#0a1128]/60 border border-brand-orange/40 p-6 rounded-xl flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="block text-slate-500 text-[10px] uppercase font-bold tracking-wider">Needs Follow-up</span>
+            <span className="block text-2xl font-black text-brand-orange">{metrics.newLeadsCount}</span>
+            <span className="block text-[10px] text-slate-400 font-semibold">New, Unactioned Leads</span>
+          </div>
+          <div className="bg-brand-orange/10 p-3 rounded-lg text-brand-orange">
+            <BadgePlus className="w-6 h-6" />
+          </div>
+        </div>
+
         {/* Total Quotes */}
         <div className="bg-[#0a1128]/60 border border-brand-slate/40 p-6 rounded-xl flex items-center justify-between">
           <div className="space-y-1">
@@ -164,8 +187,38 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Lists Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {/* Recently Viewed Products */}
+        <div className="bg-[#0a1128]/40 border border-brand-slate/30 rounded-xl p-6 space-y-4">
+          <div className="flex justify-between items-center border-b border-brand-slate/20 pb-3">
+            <h3 className="text-white font-bold text-sm flex items-center gap-1.5">
+              <Eye className="w-4 h-4 text-brand-orange" />
+              Recently Viewed Products
+            </h3>
+          </div>
+
+          <div className="divide-y divide-brand-slate/10 space-y-3">
+            {recentViews.length === 0 ? (
+              <p className="text-slate-500 text-xs italic pt-2">No product views recorded yet.</p>
+            ) : (
+              recentViews.map((v: any) => (
+                <div key={v.id} className="pt-3 flex justify-between items-start text-xs">
+                  <div className="space-y-1">
+                    <div className="font-bold text-white">{v.product?.name || "Unknown product"}</div>
+                    <div className="text-slate-400 font-semibold">
+                      {v.user?.name || v.user?.email || "Anonymous visitor"}
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-slate-500 whitespace-nowrap">
+                    {new Date(v.createdAt).toLocaleString()}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
         {/* Recent Quotes List */}
         <div className="bg-[#0a1128]/40 border border-brand-slate/30 rounded-xl p-6 space-y-4">
           <div className="flex justify-between items-center border-b border-brand-slate/20 pb-3">

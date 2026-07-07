@@ -14,16 +14,20 @@ export const PATCH = auth(async function PATCH(req, context: any) {
 
   try {
     const body = await req.json();
-    const { status } = body;
+    const { status, notes, lastContactedAt } = body;
 
     const updated = await prisma.quoteRequest.update({
       where: { id },
-      data: { status },
+      data: {
+        ...(status !== undefined && { status }),
+        ...(notes !== undefined && { notes }),
+        ...(lastContactedAt !== undefined && { lastContactedAt: new Date(lastContactedAt) }),
+      },
     });
 
     return NextResponse.json(updated);
   } catch (error: any) {
     console.error("PATCH quote status error:", error);
-    return NextResponse.json({ mockSuccess: true });
+    return NextResponse.json({ error: "Could not update this lead." }, { status: 500 });
   }
 }) as any;

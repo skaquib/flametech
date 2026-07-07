@@ -24,10 +24,15 @@ export const GET = auth(async function GET(req) {
 
 // POST /api/quotes (Public Lead ingestion)
 export async function POST(req: NextRequest) {
+  const body = await req.json();
+  const { productId, name, company, phone, email, message } = body;
+
+  if (!productId || !name || !phone) {
+    return NextResponse.json({ error: "productId, name, and phone are required." }, { status: 400 });
+  }
+
   try {
     const session = await auth();
-    const body = await req.json();
-    const { productId, name, company, phone, email, message } = body;
 
     const newQuote = await prisma.quoteRequest.create({
       data: {
@@ -45,6 +50,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(newQuote, { status: 201 });
   } catch (error: any) {
     console.error("Quote create API error:", error);
-    return NextResponse.json({ mockCreated: true, timestamp: new Date() });
+    return NextResponse.json({ error: "Could not save your request. Please try again." }, { status: 500 });
   }
 }

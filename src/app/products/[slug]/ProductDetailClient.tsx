@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
 import { Flame, Settings, ShoppingCart, Check, FileText, Send, HelpCircle, CheckCircle2 } from "lucide-react";
@@ -35,15 +35,19 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const isEquipment = product.type === "EQUIPMENT";
   const addItem = useCartStore((state) => state.addItem);
 
+  const keySpec = product.specs && product.specs.length > 0 ? product.specs[0] : null;
+
   const faqList = isEquipment
     ? [
-        "What is the estimated delivery time for this burner model?",
-        "Can you share the CAD / dimensional drawing for this model?",
+        `What is the estimated delivery time for the ${product.name}?`,
+        keySpec
+          ? `Can you confirm the ${keySpec.label.toLowerCase()} (${keySpec.value}${keySpec.unit ? ` ${keySpec.unit}` : ""}) is right for my application?`
+          : "Can you share the CAD / dimensional drawing for this model?",
         "Do you provide commissioning and installation support at my location?",
         "What is the fuel consumption difference between gas and oil for this capacity?",
       ]
     : [
-        "Is this spare part fully compatible with standard Riello/Oxilon burners?",
+        `Is the ${product.name} fully compatible with standard Riello/Oxilon burners?`,
         "What is the warranty coverage period on this accessory?",
         "Do you offer commercial quantity discounts for bulk industrial buys?",
         "Can I pay via purchase order (PO) instead of online gateway?",
@@ -70,6 +74,17 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   });
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
   const [quoteLoading, setQuoteLoading] = useState(false);
+  const [quoteError, setQuoteError] = useState(false);
+
+  // Fire-and-forget view tracking — failures shouldn't affect the page
+  useEffect(() => {
+    fetch("/api/track/view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId: product.id }),
+    }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id]);
 
   const handleQtyChange = (val: number) => {
     if (val < 1) return;
@@ -94,22 +109,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const handleQuoteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setQuoteLoading(true);
-    
-    // Format WhatsApp details
-    const phone = "919768417740";
-    const text = `Hello FlameTech Engineering! I would like to request a quote for *${product.name}* (Code: *${product.itemCode || "N/A"}*).
-
-*My Details:*
-- Name: ${quoteForm.name}
-- Company: ${quoteForm.company || "N/A"}
-- Phone: ${quoteForm.phone}
-- Email: ${quoteForm.email || "N/A"}
-- Requested Qty: ${quoteForm.quantity}
-
-*Message / Requirements:*
-${quoteForm.message || "N/A"}`;
-
-    const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+    setQuoteError(false);
 
     try {
       const response = await fetch("/api/quotes", {
@@ -127,16 +127,26 @@ ${quoteForm.message || "N/A"}`;
 
       if (response.ok) {
         setQuoteSubmitted(true);
-        window.open(waUrl, "_blank");
+        // WhatsApp is a bonus notification channel, not the record of truth —
+        // only opened once we know the lead is actually saved.
+        const phone = "919768417740";
+        const text = `Hello FlameTech Engineering! I would like to request a quote for *${product.name}* (Code: *${product.itemCode || "N/A"}*).
+
+*My Details:*
+- Name: ${quoteForm.name}
+- Company: ${quoteForm.company || "N/A"}
+- Phone: ${quoteForm.phone}
+- Email: ${quoteForm.email || "N/A"}
+- Requested Qty: ${quoteForm.quantity}
+
+*Message / Requirements:*
+${quoteForm.message || "N/A"}`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, "_blank");
       } else {
-        console.warn("API error, triggering WhatsApp fallback");
-        setQuoteSubmitted(true);
-        window.open(waUrl, "_blank");
+        setQuoteError(true);
       }
     } catch (err) {
-      console.warn("Fetch failed, triggering WhatsApp fallback");
-      setQuoteSubmitted(true);
-      window.open(waUrl, "_blank");
+      setQuoteError(true);
     } finally {
       setQuoteLoading(false);
     }
@@ -263,6 +273,20 @@ ${quoteForm.message || "N/A"}`;
                     Fill in your project requirements for direct plant pricing.
                   </p>
                 </div>
+
+                {quoteError && (
+                  <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 rounded-lg p-3 text-xs text-red-700 dark:text-red-400 space-y-1.5">
+                    <p className="font-bold">We couldn't save your request — please try again, or reach us directly:</p>
+                    <a
+                      href={`https://wa.me/919768417740?text=${encodeURIComponent(`Hello FlameTech Engineering! I would like to request a quote for *${product.name}* (Code: *${product.itemCode || "N/A"}*). My phone: ${quoteForm.phone || "N/A"}`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block font-bold text-emerald-600 dark:text-emerald-400 underline"
+                    >
+                      Message us on WhatsApp instead →
+                    </a>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5 col-span-2">
