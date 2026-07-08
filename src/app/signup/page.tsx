@@ -1,14 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Flame, ShieldAlert, KeyRound, Mail, User, Phone, Building2, ArrowRight } from "lucide-react";
 
 export default function SignupPage() {
-  const router = useRouter();
-
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -61,9 +58,10 @@ export default function SignupPage() {
 
       if (result?.error) {
         // Account was created but auto-login failed — send them to sign in manually
-        router.push("/login");
+        window.location.href = "/login";
       } else {
-        router.push("/");
+        // Hard navigation so the navbar's session state is fresh immediately
+        window.location.href = "/";
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");

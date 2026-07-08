@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Flame, ShieldAlert, KeyRound, Mail, ArrowRight } from "lucide-react";
 
 function CustomerLoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   
   const [form, setForm] = useState({ email: "", password: "" });
@@ -31,7 +30,8 @@ function CustomerLoginForm() {
         setError("Invalid email address or password combination.");
         setLoading(false);
       } else {
-        router.push("/");
+        // Hard navigation so the navbar's session state is fresh immediately
+        window.location.href = "/";
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");

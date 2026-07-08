@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Flame, ShieldAlert, KeyRound, Mail, ArrowRight } from "lucide-react";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   
   const [form, setForm] = useState({ email: "", password: "" });
@@ -31,7 +30,10 @@ function LoginForm() {
         setError("Invalid credentials or insufficient admin rights.");
         setLoading(false);
       } else {
-        router.push("/admin/dashboard");
+        // Hard navigation: a client-side router.push() here can race the
+        // proxy's auth check against the freshly-set session cookie and
+        // get silently aborted on real-world network latency (production).
+        window.location.href = "/admin/dashboard";
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
