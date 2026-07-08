@@ -60,7 +60,6 @@ export const POST = auth(async function POST(req) {
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error: any) {
     console.error("API Create product error:", error);
-    // fallback success response in sandbox mode for validation
-    return NextResponse.json({ mockCreated: true, timestamp: new Date() });
+    return NextResponse.json({ error: "Could not create the product. Check that the slug is unique." }, { status: 500 });
   }
 }) as any;

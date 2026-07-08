@@ -8,6 +8,7 @@ interface Product {
   id: string;
   name: string;
   slug: string;
+  image?: string | null;
   itemCode: string | null;
   type: "EQUIPMENT" | "PART" | "SERVICE";
   price: number | null;
@@ -62,7 +63,7 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
             placeholder="Search products, item codes..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#0a1128]/60 border border-slate-700 rounded-md py-2 px-3 pl-9 text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
+            className="w-full bg-white dark:bg-[#0a1128]/60 border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 pl-9 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
           />
           <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-3" />
         </div>
@@ -80,7 +81,7 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
               className={`px-3 py-1.5 border rounded text-[10px] font-bold uppercase transition-colors ${
                 selectedType === t.val
                   ? "bg-brand-orange/15 border-brand-orange text-brand-orange"
-                  : "bg-brand-dark/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white"
+                  : "bg-slate-100 dark:bg-brand-dark/40 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               {t.label}
@@ -91,15 +92,16 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
 
       {/* Products Table */}
       {filteredList.length === 0 ? (
-        <div className="bg-[#0a1128]/20 border border-dashed border-slate-800 rounded-xl p-12 text-center text-slate-500">
-          <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+        <div className="bg-white dark:bg-[#0a1128]/20 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl p-12 text-center text-slate-500">
+          <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-slate-400 dark:text-slate-600" />
           <p className="text-sm">No items found matching the current filters.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-brand-slate/40">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-brand-slate/40">
           <table className="w-full text-xs text-left">
-            <thead className="bg-[#0a1128]/80 text-[10px] font-bold text-slate-400 border-b border-brand-slate/40 uppercase tracking-wider">
+            <thead className="bg-slate-100 dark:bg-[#0a1128]/80 text-[10px] font-bold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-brand-slate/40 uppercase tracking-wider">
               <tr>
+                <th className="px-6 py-4">Image</th>
                 <th className="px-6 py-4">Item Name / Code</th>
                 <th className="px-6 py-4">Type</th>
                 <th className="px-6 py-4">B2B Base Price</th>
@@ -108,16 +110,29 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-brand-slate/20">
+            <tbody className="bg-white dark:bg-transparent divide-y divide-slate-200 dark:divide-brand-slate/20">
               {filteredList.map((p) => {
                 const isEquipment = p.type === "EQUIPMENT";
 
                 return (
-                  <tr key={p.id} className="hover:bg-slate-900/10 transition-colors">
-                    
+                  <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/10 transition-colors">
+
+                    {/* Thumbnail */}
+                    <td className="px-6 py-4">
+                      <div className="w-12 h-12 rounded-md bg-slate-100 dark:bg-brand-slate/30 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
+                        {p.image ? (
+                          <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                        ) : isEquipment ? (
+                          <Flame className="w-5 h-5 text-brand-orange/30" />
+                        ) : (
+                          <Settings className="w-5 h-5 text-brand-teal/30" />
+                        )}
+                      </div>
+                    </td>
+
                     {/* Name/Code */}
                     <td className="px-6 py-4">
-                      <div className="font-bold text-white text-sm">{p.name}</div>
+                      <div className="font-bold text-slate-900 dark:text-white text-sm">{p.name}</div>
                       <div className="text-[10px] text-slate-500 font-semibold mt-0.5">
                         Code: {p.itemCode || "N/A"}
                       </div>
@@ -138,12 +153,12 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
                     </td>
 
                     {/* Price */}
-                    <td className="px-6 py-4 font-bold text-slate-300">
+                    <td className="px-6 py-4 font-bold text-slate-700 dark:text-slate-300">
                       {isEquipment ? "Quote Flow Only" : `₹${p.price?.toLocaleString()}`}
                     </td>
 
                     {/* Stock */}
-                    <td className="px-6 py-4 text-slate-300 font-semibold">
+                    <td className="px-6 py-4 text-slate-700 dark:text-slate-300 font-semibold">
                       {isEquipment ? "N/A" : `${p.stockQty} ${p.unit || "PCS"}`}
                     </td>
 
@@ -168,7 +183,7 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
                         <Link
                           href={`/products/${p.slug}`}
                           target="_blank"
-                          className="p-2 bg-brand-slate border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white rounded-md"
+                          className="p-2 bg-slate-100 dark:bg-brand-slate border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-md"
                           title="View on site"
                         >
                           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -178,7 +193,7 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
                         </Link>
                         <Link
                           href={`/admin/products/${p.id}`}
-                          className="p-2 bg-brand-slate border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white rounded-md"
+                          className="p-2 bg-slate-100 dark:bg-brand-slate border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-md"
                           title="Edit details"
                         >
                           <Edit3 className="w-3.5 h-3.5" />

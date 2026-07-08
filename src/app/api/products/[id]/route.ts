@@ -98,6 +98,6 @@ export const DELETE = auth(async function DELETE(req, context: any) {
     return NextResponse.json(deleted);
   } catch (error: any) {
     console.error("DELETE product error:", error);
-    return NextResponse.json({ mockSuccess: true });
+    return NextResponse.json({ error: "Could not delete this product." }, { status: 500 });
   }
 }) as any;

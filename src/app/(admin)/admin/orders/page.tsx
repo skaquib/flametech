@@ -54,7 +54,7 @@ export default async function AdminOrdersPage() {
     <div className="space-y-8 text-left">
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-black text-white">Direct Online Orders</h1>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white">Direct Online Orders</h1>
         <p className="text-slate-500 text-xs mt-1">Manage e-commerce order statuses, payments validation, and logistics tracking.</p>
       </div>
 

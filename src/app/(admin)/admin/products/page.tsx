@@ -75,7 +75,7 @@ export default async function AdminProductsPage() {
       {/* Title block */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-black text-white">Products Directory</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">Products Directory</h1>
           <p className="text-slate-500 text-xs mt-1">Manage burners catalog items, spares inventory details, and visibility status.</p>
         </div>
         <Link

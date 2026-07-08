@@ -63,7 +63,7 @@ export default async function AdminQuotesPage() {
     <div className="space-y-8 text-left">
       {/* Title */}
       <div>
-        <h1 className="text-2xl font-black text-white">B2B Quote Requests</h1>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white">B2B Quote Requests</h1>
         <p className="text-slate-500 text-xs mt-1">Track and manage customer leads through the sales pipeline (New → Contacted → Quoted → Converted).</p>
       </div>
 

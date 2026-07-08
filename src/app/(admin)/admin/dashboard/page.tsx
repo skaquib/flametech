@@ -119,18 +119,18 @@ export default async function AdminDashboardPage() {
     <div className="space-y-8 text-left">
       {/* Page Title */}
       <div>
-        <h1 className="text-2xl font-black text-white">Dashboard Overview</h1>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white">Dashboard Overview</h1>
         <p className="text-slate-500 text-xs mt-1">Real-time status of quote requests, inventory stock alerts, and parts ordering.</p>
       </div>
 
       {/* Metrics Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         {/* New / Unactioned Leads */}
-        <div className="bg-[#0a1128]/60 border border-brand-orange/40 p-6 rounded-xl flex items-center justify-between">
+        <div className="bg-white dark:bg-[#0a1128]/60 border border-brand-orange/40 p-6 rounded-xl flex items-center justify-between">
           <div className="space-y-1">
             <span className="block text-slate-500 text-[10px] uppercase font-bold tracking-wider">Needs Follow-up</span>
             <span className="block text-2xl font-black text-brand-orange">{metrics.newLeadsCount}</span>
-            <span className="block text-[10px] text-slate-400 font-semibold">New, Unactioned Leads</span>
+            <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-semibold">New, Unactioned Leads</span>
           </div>
           <div className="bg-brand-orange/10 p-3 rounded-lg text-brand-orange">
             <BadgePlus className="w-6 h-6" />
@@ -138,11 +138,11 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Total Quotes */}
-        <div className="bg-[#0a1128]/60 border border-brand-slate/40 p-6 rounded-xl flex items-center justify-between">
+        <div className="bg-white dark:bg-[#0a1128]/60 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl flex items-center justify-between">
           <div className="space-y-1">
             <span className="block text-slate-500 text-[10px] uppercase font-bold tracking-wider">Leads Pipeline</span>
-            <span className="block text-2xl font-black text-white">{metrics.totalQuotes}</span>
-            <span className="block text-[10px] text-slate-400 font-semibold">Quote Requests</span>
+            <span className="block text-2xl font-black text-slate-900 dark:text-white">{metrics.totalQuotes}</span>
+            <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Quote Requests</span>
           </div>
           <div className="bg-brand-orange/10 p-3 rounded-lg text-brand-orange">
             <ClipboardList className="w-6 h-6" />
@@ -150,11 +150,11 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Active Orders */}
-        <div className="bg-[#0a1128]/60 border border-brand-slate/40 p-6 rounded-xl flex items-center justify-between">
+        <div className="bg-white dark:bg-[#0a1128]/60 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl flex items-center justify-between">
           <div className="space-y-1">
             <span className="block text-slate-500 text-[10px] uppercase font-bold tracking-wider">Production Line</span>
-            <span className="block text-2xl font-black text-white">{metrics.activeOrders}</span>
-            <span className="block text-[10px] text-slate-400 font-semibold">Active Orders</span>
+            <span className="block text-2xl font-black text-slate-900 dark:text-white">{metrics.activeOrders}</span>
+            <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Active Orders</span>
           </div>
           <div className="bg-brand-orange/10 p-3 rounded-lg text-brand-orange">
             <ShoppingBag className="w-6 h-6" />
@@ -162,11 +162,11 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Total Sales Revenue */}
-        <div className="bg-[#0a1128]/60 border border-brand-slate/40 p-6 rounded-xl flex items-center justify-between">
+        <div className="bg-white dark:bg-[#0a1128]/60 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl flex items-center justify-between">
           <div className="space-y-1">
             <span className="block text-slate-500 text-[10px] uppercase font-bold tracking-wider">E-commerce Sales</span>
-            <span className="block text-2xl font-black text-white">₹{metrics.totalRevenue.toLocaleString()}</span>
-            <span className="block text-[10px] text-slate-400 font-semibold">Online Earnings</span>
+            <span className="block text-2xl font-black text-slate-900 dark:text-white">₹{metrics.totalRevenue.toLocaleString()}</span>
+            <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Online Earnings</span>
           </div>
           <div className="bg-brand-orange/10 p-3 rounded-lg text-brand-orange">
             <span className="text-lg font-black">₹</span>
@@ -174,11 +174,11 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Low Stock count */}
-        <div className="bg-[#0a1128]/60 border border-brand-slate/40 p-6 rounded-xl flex items-center justify-between">
+        <div className="bg-white dark:bg-[#0a1128]/60 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl flex items-center justify-between">
           <div className="space-y-1">
             <span className="block text-slate-500 text-[10px] uppercase font-bold tracking-wider">Inventory Alerts</span>
             <span className="block text-2xl font-black text-red-500">{metrics.lowStockCount}</span>
-            <span className="block text-[10px] text-slate-400 font-semibold">Low Spares Items</span>
+            <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Low Spares Items</span>
           </div>
           <div className="bg-red-500/10 p-3 rounded-lg text-red-500">
             <ShieldAlert className="w-6 h-6 animate-pulse" />
@@ -190,23 +190,23 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Recently Viewed Products */}
-        <div className="bg-[#0a1128]/40 border border-brand-slate/30 rounded-xl p-6 space-y-4">
-          <div className="flex justify-between items-center border-b border-brand-slate/20 pb-3">
-            <h3 className="text-white font-bold text-sm flex items-center gap-1.5">
+        <div className="bg-white dark:bg-[#0a1128]/40 border border-slate-200 dark:border-brand-slate/30 rounded-xl p-6 space-y-4">
+          <div className="flex justify-between items-center border-b border-slate-200 dark:border-brand-slate/20 pb-3">
+            <h3 className="text-slate-900 dark:text-white font-bold text-sm flex items-center gap-1.5">
               <Eye className="w-4 h-4 text-brand-orange" />
               Recently Viewed Products
             </h3>
           </div>
 
-          <div className="divide-y divide-brand-slate/10 space-y-3">
+          <div className="divide-y divide-slate-200 dark:divide-brand-slate/10 space-y-3">
             {recentViews.length === 0 ? (
               <p className="text-slate-500 text-xs italic pt-2">No product views recorded yet.</p>
             ) : (
               recentViews.map((v: any) => (
                 <div key={v.id} className="pt-3 flex justify-between items-start text-xs">
                   <div className="space-y-1">
-                    <div className="font-bold text-white">{v.product?.name || "Unknown product"}</div>
-                    <div className="text-slate-400 font-semibold">
+                    <div className="font-bold text-slate-900 dark:text-white">{v.product?.name || "Unknown product"}</div>
+                    <div className="text-slate-500 dark:text-slate-400 font-semibold">
                       {v.user?.name || v.user?.email || "Anonymous visitor"}
                     </div>
                   </div>
@@ -220,26 +220,26 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Recent Quotes List */}
-        <div className="bg-[#0a1128]/40 border border-brand-slate/30 rounded-xl p-6 space-y-4">
-          <div className="flex justify-between items-center border-b border-brand-slate/20 pb-3">
-            <h3 className="text-white font-bold text-sm">Recent Quote Requests</h3>
+        <div className="bg-white dark:bg-[#0a1128]/40 border border-slate-200 dark:border-brand-slate/30 rounded-xl p-6 space-y-4">
+          <div className="flex justify-between items-center border-b border-slate-200 dark:border-brand-slate/20 pb-3">
+            <h3 className="text-slate-900 dark:text-white font-bold text-sm">Recent Quote Requests</h3>
             <Link
               href="/admin/quotes"
-              className="text-brand-orange text-xs font-bold hover:text-white transition-colors flex items-center space-x-1"
+              className="text-brand-orange text-xs font-bold hover:text-slate-900 dark:hover:text-white transition-colors flex items-center space-x-1"
             >
               <span>View all</span>
               <ArrowUpRight className="w-3 h-3" />
             </Link>
           </div>
 
-          <div className="divide-y divide-brand-slate/10 space-y-3">
+          <div className="divide-y divide-slate-200 dark:divide-brand-slate/10 space-y-3">
             {recentQuotes.map((q: any) => (
               <div key={q.id} className="pt-3 flex justify-between items-start text-xs">
                 <div className="space-y-1">
-                  <div className="font-bold text-white">
+                  <div className="font-bold text-slate-900 dark:text-white">
                     {q.name} <span className="text-slate-500 font-normal">from</span> {q.company}
                   </div>
-                  <div className="text-slate-400 font-semibold">
+                  <div className="text-slate-500 dark:text-slate-400 font-semibold">
                     Product: {q.product.name}
                   </div>
                   <p className="text-slate-500 line-clamp-1 italic">{q.message}</p>
@@ -258,24 +258,24 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Recent Orders List */}
-        <div className="bg-[#0a1128]/40 border border-brand-slate/30 rounded-xl p-6 space-y-4">
-          <div className="flex justify-between items-center border-b border-brand-slate/20 pb-3">
-            <h3 className="text-white font-bold text-sm">Recent Direct Orders</h3>
+        <div className="bg-white dark:bg-[#0a1128]/40 border border-slate-200 dark:border-brand-slate/30 rounded-xl p-6 space-y-4">
+          <div className="flex justify-between items-center border-b border-slate-200 dark:border-brand-slate/20 pb-3">
+            <h3 className="text-slate-900 dark:text-white font-bold text-sm">Recent Direct Orders</h3>
             <Link
               href="/admin/orders"
-              className="text-brand-orange text-xs font-bold hover:text-white transition-colors flex items-center space-x-1"
+              className="text-brand-orange text-xs font-bold hover:text-slate-900 dark:hover:text-white transition-colors flex items-center space-x-1"
             >
               <span>View all</span>
               <ArrowUpRight className="w-3 h-3" />
             </Link>
           </div>
 
-          <div className="divide-y divide-brand-slate/10 space-y-3">
+          <div className="divide-y divide-slate-200 dark:divide-brand-slate/10 space-y-3">
             {recentOrders.map((o: any) => (
               <div key={o.id} className="pt-3 flex justify-between items-center text-xs">
                 <div className="space-y-1">
-                  <div className="font-bold text-white">{o.orderNumber}</div>
-                  <div className="text-slate-400 font-semibold">
+                  <div className="font-bold text-slate-900 dark:text-white">{o.orderNumber}</div>
+                  <div className="text-slate-500 dark:text-slate-400 font-semibold">
                     Client: {o.user?.name || "B2B Guest"}
                   </div>
                 </div>

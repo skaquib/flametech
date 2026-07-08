@@ -53,9 +53,12 @@ export default function CreateProductPage() {
     );
   };
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSubmitError(null);
 
     try {
       const response = await fetch("/api/products", {
@@ -71,17 +74,13 @@ export default function CreateProductPage() {
       });
 
       if (response.ok) {
-        alert("Product created successfully (simulated/persisted)!");
         router.push("/admin/products");
       } else {
-        console.warn("API returned error, redirecting...");
-        alert("Simulated: Product created successfully!");
-        router.push("/admin/products");
+        const data = await response.json().catch(() => ({}));
+        setSubmitError(data.error || "Could not create the product. Please try again.");
       }
     } catch (err) {
-      console.warn("Connection error, redirecting...");
-      alert("Simulated: Product created successfully!");
-      router.push("/admin/products");
+      setSubmitError("Connection error — could not reach the server. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -93,62 +92,62 @@ export default function CreateProductPage() {
       <div className="space-y-2">
         <Link
           href="/admin/products"
-          className="inline-flex items-center space-x-1 text-slate-400 hover:text-white transition-colors text-xs font-semibold"
+          className="inline-flex items-center space-x-1 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors text-xs font-semibold"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Products Directory</span>
         </Link>
-        <h1 className="text-2xl font-black text-white">Create New Catalog Product</h1>
+        <h1 className="text-2xl font-black text-slate-900 dark:text-white">Create New Catalog Product</h1>
         <p className="text-slate-500 text-xs">Define equipment specs or standard parts catalog items.</p>
       </div>
 
       <form onSubmit={handleFormSubmit} className="space-y-6">
         
         {/* Core details block */}
-        <div className="bg-[#0a1128]/50 border border-brand-slate/40 p-6 rounded-xl space-y-4">
-          <h3 className="text-white font-bold text-sm border-b border-brand-slate/30 pb-2">Core Product Details</h3>
+        <div className="bg-white dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl space-y-4">
+          <h3 className="text-slate-900 dark:text-white font-bold text-sm border-b border-slate-200 dark:border-brand-slate/30 pb-2">Core Product Details</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5 col-span-2">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Product Name *</label>
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Product Name *</label>
               <input
                 type="text"
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value, slug: e.target.value.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-") })}
                 placeholder="e.g. FlameTech FT-30 Gas Burner"
-                className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none focus:border-brand-orange"
+                className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-brand-orange"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Product Slug *</label>
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Product Slug *</label>
               <input
                 type="text"
                 required
                 value={form.slug}
                 onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none focus:border-brand-orange"
+                className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-brand-orange"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Item Code (Sku)</label>
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Item Code (Sku)</label>
               <input
                 type="text"
                 value={form.itemCode}
                 onChange={(e) => setForm({ ...form, itemCode: e.target.value })}
                 placeholder="e.g. FT-30-GB"
-                className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none"
+                className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Category</label>
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Category</label>
               <select
                 value={form.categoryId}
                 onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
-                className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none"
+                className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
               >
                 <option value="gas-burners">Gas Burners</option>
                 <option value="oil-burners">Oil Burners</option>
@@ -158,11 +157,11 @@ export default function CreateProductPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Product Flow Type</label>
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Product Flow Type</label>
               <select
                 value={form.type}
                 onChange={(e) => setForm({ ...form, type: e.target.value })}
-                className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none"
+                className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
               >
                 <option value="EQUIPMENT">EQUIPMENT (B2B Lead/Quote Flow)</option>
                 <option value="PART">PART (E-commerce Buy-Now Flow)</option>
@@ -174,39 +173,39 @@ export default function CreateProductPage() {
 
         {/* Pricing & inventory (spares) */}
         {form.type !== "EQUIPMENT" && (
-          <div className="bg-[#0a1128]/50 border border-brand-slate/40 p-6 rounded-xl space-y-4 animate-fade-in-up">
-            <h3 className="text-white font-bold text-sm border-b border-brand-slate/30 pb-2">Pricing & Inventory</h3>
+          <div className="bg-white dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl space-y-4 animate-fade-in-up">
+            <h3 className="text-slate-900 dark:text-white font-bold text-sm border-b border-slate-200 dark:border-brand-slate/30 pb-2">Pricing & Inventory</h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Base Price (INR) *</label>
+                <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Base Price (INR) *</label>
                 <input
                   type="number"
                   required
                   value={form.price}
                   onChange={(e) => setForm({ ...form, price: e.target.value })}
                   placeholder="e.g. 3499"
-                  className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none"
+                  className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Stock Qty *</label>
+                <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Stock Qty *</label>
                 <input
                   type="number"
                   required
                   value={form.stockQty}
                   onChange={(e) => setForm({ ...form, stockQty: e.target.value })}
                   placeholder="e.g. 50"
-                  className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none"
+                  className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Sales Unit</label>
+                <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Sales Unit</label>
                 <input
                   type="text"
                   value={form.unit}
                   onChange={(e) => setForm({ ...form, unit: e.target.value })}
                   placeholder="PIECES, SET"
-                  className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none"
+                  className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
                 />
               </div>
             </div>
@@ -226,7 +225,7 @@ export default function CreateProductPage() {
                   className="w-full h-full object-contain p-2"
                 />
               ) : (
-                <span className="text-xs text-slate-400 italic">No image uploaded</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 italic">No image uploaded</span>
               )}
             </div>
 
@@ -266,34 +265,34 @@ export default function CreateProductPage() {
         </div>
 
         {/* Short & Long descriptions */}
-        <div className="bg-[#0a1128]/50 border border-brand-slate/40 p-6 rounded-xl space-y-4">
-          <h3 className="text-white font-bold text-sm border-b border-brand-slate/30 pb-2">Catalog Explanatory text</h3>
+        <div className="bg-white dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl space-y-4">
+          <h3 className="text-slate-900 dark:text-white font-bold text-sm border-b border-slate-200 dark:border-brand-slate/30 pb-2">Catalog Explanatory text</h3>
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Short Tagline Description</label>
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Short Tagline Description</label>
               <input
                 type="text"
                 value={form.shortDesc}
                 onChange={(e) => setForm({ ...form, shortDesc: e.target.value })}
                 placeholder="High output double stage utility burner..."
-                className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none"
+                className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Long Description</label>
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Long Description</label>
               <textarea
                 rows={4}
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 placeholder="Details on combustion parameters, materials, valves, safety checks..."
-                className="w-full bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-sm focus:outline-none resize-none"
+                className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none resize-none"
               />
             </div>
           </div>
         </div>
 
         {/* Dynamic specification rows */}
-        <div className="bg-[#0a1128]/50 border border-brand-slate/40 p-6 rounded-xl space-y-4">
+        <div className="bg-white dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl space-y-4">
           <div className="flex justify-between items-center border-b border-brand-slate/30 pb-2">
             <h3 className="text-white font-bold text-sm">Technical Specifications Table Rows</h3>
             <button
@@ -315,7 +314,7 @@ export default function CreateProductPage() {
                   placeholder="Parameter Label (e.g. Thermal Power)"
                   value={s.label}
                   onChange={(e) => handleSpecChange(idx, "label", e.target.value)}
-                  className="flex-1 bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
+                  className="flex-1 bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
                 />
                 <input
                   type="text"
@@ -323,7 +322,7 @@ export default function CreateProductPage() {
                   placeholder="Value (e.g. 50 - 150 KW)"
                   value={s.value}
                   onChange={(e) => handleSpecChange(idx, "value", e.target.value)}
-                  className="flex-1 bg-[#060b13] border border-slate-700 rounded-md py-2 px-3 text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
+                  className="flex-1 bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
                 />
                 <button
                   type="button"
@@ -338,15 +337,15 @@ export default function CreateProductPage() {
         </div>
 
         {/* Sectors checklist */}
-        <div className="bg-[#0a1128]/50 border border-brand-slate/40 p-6 rounded-xl space-y-4">
-          <h3 className="text-white font-bold text-sm border-b border-brand-slate/30 pb-2">Target Sectors (Industries)</h3>
-          <div className="flex space-x-6 text-sm text-slate-300">
+        <div className="bg-white dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl space-y-4">
+          <h3 className="text-slate-900 dark:text-white font-bold text-sm border-b border-slate-200 dark:border-brand-slate/30 pb-2">Target Sectors (Industries)</h3>
+          <div className="flex space-x-6 text-sm text-slate-700 dark:text-slate-300">
             <label className="flex items-center space-x-2 cursor-pointer">
               <input
                 type="checkbox"
                 checked={industries.metal}
                 onChange={(e) => setIndustries({ ...industries, metal: e.target.checked })}
-                className="rounded border-slate-700 bg-brand-dark text-brand-orange focus:ring-brand-orange"
+                className="rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-brand-dark text-brand-orange focus:ring-brand-orange"
               />
               <span>Powder Coating / Metal Pre-treatment</span>
             </label>
@@ -355,7 +354,7 @@ export default function CreateProductPage() {
                 type="checkbox"
                 checked={industries.chemical}
                 onChange={(e) => setIndustries({ ...industries, chemical: e.target.checked })}
-                className="rounded border-slate-700 bg-brand-dark text-brand-orange focus:ring-brand-orange"
+                className="rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-brand-dark text-brand-orange focus:ring-brand-orange"
               />
               <span>Chemical & Process Heating</span>
             </label>
@@ -364,18 +363,24 @@ export default function CreateProductPage() {
                 type="checkbox"
                 checked={industries.food}
                 onChange={(e) => setIndustries({ ...industries, food: e.target.checked })}
-                className="rounded border-slate-700 bg-brand-dark text-brand-orange focus:ring-brand-orange"
+                className="rounded border-slate-300 dark:border-slate-700 bg-white dark:bg-brand-dark text-brand-orange focus:ring-brand-orange"
               />
               <span>Bakeries & Bread Ovens</span>
             </label>
           </div>
         </div>
 
+        {submitError && (
+          <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 rounded-lg p-3 text-xs text-red-700 dark:text-red-400 font-bold">
+            {submitError}
+          </div>
+        )}
+
         {/* Form CTA */}
         <div className="pt-2 flex justify-end space-x-3">
           <Link
             href="/admin/products"
-            className="px-5 py-3 border border-slate-700 rounded-lg text-slate-300 font-bold text-xs hover:bg-slate-800/10 transition-colors"
+            className="px-5 py-3 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 font-bold text-xs hover:bg-slate-100 dark:hover:bg-slate-800/10 transition-colors"
           >
             Cancel
           </Link>

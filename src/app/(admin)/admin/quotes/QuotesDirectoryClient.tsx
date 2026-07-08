@@ -101,7 +101,7 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
               className={`px-3.5 py-1.5 border rounded text-[10px] font-bold uppercase transition-colors ${
                 selectedFilter === tab.val
                   ? "bg-brand-orange/15 border-brand-orange text-brand-orange"
-                  : "bg-brand-dark/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white"
+                  : "bg-slate-100 dark:bg-brand-dark/40 border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-400 dark:hover:border-slate-700 hover:text-slate-900 dark:hover:text-white"
               }`}
             >
               {tab.label}
@@ -116,21 +116,21 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             placeholder="Search name, company, phone, product..."
-            className="bg-[#060b13] border border-slate-700 rounded text-xs py-1.5 pl-8 pr-3 text-slate-300 focus:outline-none focus:border-brand-orange w-72"
+            className="bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded text-xs py-1.5 pl-8 pr-3 text-slate-800 dark:text-slate-300 focus:outline-none focus:border-brand-orange w-72"
           />
         </div>
       </div>
 
       {/* Leads Table */}
       {pagedQuotes.length === 0 ? (
-        <div className="bg-[#0a1128]/20 border border-dashed border-slate-800 rounded-xl p-12 text-center text-slate-500">
-          <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-slate-600" />
+        <div className="bg-white dark:bg-[#0a1128]/20 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl p-12 text-center text-slate-500">
+          <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-slate-400 dark:text-slate-600" />
           <p className="text-sm">No quote requests found matching this filter/search.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-brand-slate/40">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-brand-slate/40">
           <table className="w-full text-xs text-left">
-            <thead className="bg-[#0a1128]/80 text-[10px] font-bold text-slate-400 border-b border-brand-slate/40 uppercase tracking-wider">
+            <thead className="bg-slate-100 dark:bg-[#0a1128]/80 text-[10px] font-bold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-brand-slate/40 uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-4">Client Contact</th>
                 <th className="px-6 py-4">Requested Item</th>
@@ -140,13 +140,13 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
                 <th className="px-6 py-4 text-right">Pipeline Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-brand-slate/20">
+            <tbody className="bg-white dark:bg-transparent divide-y divide-slate-200 dark:divide-brand-slate/20">
               {pagedQuotes.map((q) => (
-                <tr key={q.id} className="hover:bg-slate-900/10 transition-colors align-top">
+                <tr key={q.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/10 transition-colors align-top">
 
                   {/* Name/Company */}
                   <td className="px-6 py-4 space-y-1.5">
-                    <div className="font-bold text-white text-sm">{q.name}</div>
+                    <div className="font-bold text-slate-900 dark:text-white text-sm">{q.name}</div>
                     <div className="text-brand-orange text-[10px] font-bold uppercase">{q.company || "Individual B2B"}</div>
                     <span className="text-[10px] text-slate-500 block">
                       Received: {new Date(q.createdAt).toLocaleDateString()}
@@ -160,14 +160,14 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
 
                   {/* Product */}
                   <td className="px-6 py-4">
-                    <span className="font-semibold text-slate-200 text-xs block max-w-[200px] truncate">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200 text-xs block max-w-[200px] truncate">
                       {q.product?.name || "FlameTech Custom Gas Burner"}
                     </span>
                   </td>
 
                   {/* Contact channels & message */}
                   <td className="px-6 py-4 space-y-2 max-w-sm">
-                    <div className="flex flex-col space-y-1 text-slate-400">
+                    <div className="flex flex-col space-y-1 text-slate-600 dark:text-slate-400">
                       <div className="flex items-center space-x-1.5">
                         <Phone className="w-3 h-3 text-slate-500" />
                         <span>{q.phone}</span>
@@ -192,7 +192,7 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
                       onChange={(e) => setNotesDraft({ ...notesDraft, [q.id]: e.target.value })}
                       onBlur={() => handleSaveNotes(q.id)}
                       placeholder="Add a follow-up note..."
-                      className="w-full bg-[#060b13] border border-slate-700 rounded text-[10px] py-1.5 px-2 text-slate-300 focus:outline-none focus:border-brand-orange resize-none"
+                      className="w-full bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded text-[10px] py-1.5 px-2 text-slate-800 dark:text-slate-300 focus:outline-none focus:border-brand-orange resize-none"
                     />
                   </td>
 
@@ -220,7 +220,7 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
                       <select
                         value={q.status}
                         onChange={(e) => handleUpdateStatus(q.id, e.target.value as any)}
-                        className="bg-[#060b13] border border-slate-700 rounded text-[10px] py-1 px-2 text-slate-300 font-bold focus:outline-none"
+                        className="bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded text-[10px] py-1 px-2 text-slate-700 dark:text-slate-300 font-bold focus:outline-none"
                       >
                         <option value="NEW">Mark New</option>
                         <option value="CONTACTED">Mark Contacted</option>
@@ -246,7 +246,7 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
 
       {/* Pagination */}
       {filteredQuotes.length > PAGE_SIZE && (
-        <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
           <span>
             Showing {(page - 1) * PAGE_SIZE + 1}-{Math.min(page * PAGE_SIZE, filteredQuotes.length)} of {filteredQuotes.length}
           </span>
@@ -254,7 +254,7 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1 border border-slate-700 rounded disabled:opacity-30 hover:border-slate-500"
+              className="px-3 py-1 border border-slate-300 dark:border-slate-700 rounded disabled:opacity-30 hover:border-slate-500"
             >
               Prev
             </button>
@@ -262,7 +262,7 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
             <button
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-3 py-1 border border-slate-700 rounded disabled:opacity-30 hover:border-slate-500"
+              className="px-3 py-1 border border-slate-300 dark:border-slate-700 rounded disabled:opacity-30 hover:border-slate-500"
             >
               Next
             </button>
