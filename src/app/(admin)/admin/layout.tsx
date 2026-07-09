@@ -67,9 +67,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className={`min-h-screen bg-slate-50 dark:bg-brand-dark text-slate-900 dark:text-slate-100 flex text-left transition-colors duration-300`}>
+    <div className={`h-screen overflow-hidden bg-slate-50 dark:bg-brand-dark text-slate-900 dark:text-slate-100 flex text-left transition-colors duration-300`}>
       {/* Sidebar */}
-      <aside className="w-64 bg-white dark:bg-[#0a1128] border-r border-slate-200 dark:border-brand-slate/40 flex flex-col justify-between shrink-0 transition-colors duration-300">
+      <aside className="w-64 h-screen sticky top-0 bg-white dark:bg-[#0a1128] border-r border-slate-200 dark:border-brand-slate/40 flex flex-col justify-between shrink-0 overflow-y-auto transition-colors duration-300">
         <div className="p-6 space-y-8">
           {/* Logo */}
           <div className="flex items-center space-x-2">

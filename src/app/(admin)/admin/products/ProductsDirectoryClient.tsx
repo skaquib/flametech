@@ -17,13 +17,17 @@ interface Product {
   isActive: boolean;
 }
 
+const PAGE_SIZE = 25;
+
 export default function ProductsDirectoryClient({ products }: { products: Product[] }) {
   const [list, setList] = useState<Product[]>(products);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
+  const [page, setPage] = useState(1);
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     // Optimistic UI update
+    const prev = list;
     const updatedList = list.map((p) => (p.id === id ? { ...p, isActive: !currentStatus } : p));
     setList(updatedList);
 
@@ -35,10 +39,10 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
       });
 
       if (!res.ok) {
-        console.warn("DB toggle failed, keeping optimistic status");
+        setList(prev);
       }
     } catch (err) {
-      console.warn("API toggle error, keeping optimistic status");
+      setList(prev);
     }
   };
 
@@ -46,11 +50,15 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
     const matchesSearch =
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (p.itemCode && p.itemCode.toLowerCase().includes(searchTerm.toLowerCase()));
-    
+
     const matchesType = selectedType === "all" || p.type === selectedType;
 
     return matchesSearch && matchesType;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredList.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pagedList = filteredList.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <div className="space-y-6">
@@ -62,7 +70,7 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
             type="text"
             placeholder="Search products, item codes..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
             className="w-full bg-white dark:bg-[#0a1128]/60 border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 pl-9 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
           />
           <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-3" />
@@ -77,7 +85,7 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
           ].map((t) => (
             <button
               key={t.val}
-              onClick={() => setSelectedType(t.val)}
+              onClick={() => { setSelectedType(t.val); setPage(1); }}
               className={`px-3 py-1.5 border rounded text-[10px] font-bold uppercase transition-colors ${
                 selectedType === t.val
                   ? "bg-brand-orange/15 border-brand-orange text-brand-orange"
@@ -111,7 +119,7 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-transparent divide-y divide-slate-200 dark:divide-brand-slate/20">
-              {filteredList.map((p) => {
+              {pagedList.map((p) => {
                 const isEquipment = p.type === "EQUIPMENT";
 
                 return (
@@ -206,6 +214,32 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {filteredList.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+          <span>
+            Showing {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, filteredList.length)} of {filteredList.length}
+          </span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-1 border border-slate-300 dark:border-slate-700 rounded disabled:opacity-30 hover:border-slate-400 dark:hover:border-slate-500"
+            >
+              Prev
+            </button>
+            <span className="px-2 py-1">{currentPage} / {totalPages}</span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 border border-slate-300 dark:border-slate-700 rounded disabled:opacity-30 hover:border-slate-400 dark:hover:border-slate-500"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
 

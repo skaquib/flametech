@@ -448,7 +448,7 @@ export default function Home() {
               </div>
 
               {/* High-Tech HUD Stats */}
-              <div className="grid grid-cols-3 gap-4 border-t border-slate-200 dark:border-white/5 pt-6 mt-6 font-mono">
+              {/* <div className="grid grid-cols-3 gap-4 border-t border-slate-200 dark:border-white/5 pt-6 mt-6 font-mono">
                 <div>
                   <span className="block text-xl font-bold text-slate-900 dark:text-white">470+</span>
                   <span className="block text-[8px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">Spares In Stock</span>
@@ -461,7 +461,7 @@ export default function Home() {
                   <span className="block text-xl font-bold text-slate-900 dark:text-white">14+</span>
                   <span className="block text-[8px] text-slate-500 dark:text-slate-400 uppercase tracking-widest mt-0.5">Global Regions</span>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Center Column: Interactive Disassembly & Hotspots */}
@@ -1095,6 +1095,33 @@ export default function Home() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <p className="text-slate-400 dark:text-slate-500 text-xs mt-3">35+ products across 5 categories · Spare parts · Services · AMC Contracts</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Showcase */}
+      <section className="bg-slate-50 dark:bg-brand-navy/35 py-20 border-b border-slate-200 dark:border-brand-slate/40 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
+            <h2 className="text-xs uppercase font-extrabold text-brand-orange tracking-widest">See It In Action</h2>
+            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Engineered for Real-World Combustion</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
+              A closer look at the FlameTech engine — precision-built for continuous, high-efficiency industrial operation.
+            </p>
+          </div>
+
+          <div className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10">
+            <video
+              className="w-full h-auto block"
+              src="/images/in_the_end_wwwflametechengine.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              disablePictureInPicture
+              controlsList="nodownload noplaybackrate nofullscreen"
+              preload="auto"
+            />
           </div>
         </div>
       </section>
