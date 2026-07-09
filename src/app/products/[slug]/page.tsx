@@ -232,6 +232,7 @@ async function getProductBySlug(slug: string) {
       include: {
         category: true,
         specs: true,
+        images: { orderBy: { position: "asc" } },
       },
     });
     if (!product) {

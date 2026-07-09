@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
-import { Flame, Settings, ShoppingCart, Check, FileText, Send, HelpCircle, CheckCircle2 } from "lucide-react";
+import { Flame, Settings, ShoppingCart, Check, FileText, Send, HelpCircle, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ProductSpec {
   label: string;
@@ -11,11 +11,18 @@ interface ProductSpec {
   unit?: string | null;
 }
 
+interface ProductImageItem {
+  id: string;
+  url: string;
+  altText?: string | null;
+}
+
 interface Product {
   id: string;
   name: string;
   slug: string;
   image?: string | null;
+  images?: ProductImageItem[];
   itemCode: string | null;
   type: "EQUIPMENT" | "PART" | "SERVICE";
   category: {
@@ -59,10 +66,20 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   };
 
+  // Gallery: use real ProductImage records if present, else fall back to the single legacy image field
+  const gallery: ProductImageItem[] =
+    product.images && product.images.length > 0
+      ? product.images
+      : product.image
+      ? [{ id: "primary", url: product.image, altText: product.name }]
+      : [];
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
+  const activeImage = gallery[activeImageIdx];
+
   // States
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  
+
   // Quote form state
   const [quoteForm, setQuoteForm] = useState({
     name: "",
@@ -165,28 +182,76 @@ ${quoteForm.message || "N/A"}`;
           <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Item Code: {product.itemCode}</p>
         </div>
 
-        {/* Product Image Showcase */}
-        <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center group shadow-md">
-          {product.image ? (
-            <img
-              src={product.image}
-              alt={product.name}
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                if (fallback) fallback.style.display = 'flex';
-              }}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-            />
-          ) : null}
-          {/* Fallback Icon — shown directly when there's no image on file, or if the real image fails to load */}
-          <div className={`absolute inset-0 items-center justify-center pointer-events-none ${product.image ? "hidden" : "flex"}`}>
-            {isEquipment ? (
-              <Flame className="w-16 h-16 text-brand-orange/20" />
-            ) : (
-              <Settings className="w-16 h-16 text-brand-teal/20" />
+        {/* Product Image Gallery */}
+        <div className="space-y-3">
+          <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center group shadow-md">
+            {activeImage ? (
+              <img
+                key={activeImage.id}
+                src={activeImage.url}
+                alt={activeImage.altText || product.name}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (fallback) fallback.style.display = 'flex';
+                }}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
+              />
+            ) : null}
+            {/* Fallback Icon — shown directly when there's no image on file, or if the real image fails to load */}
+            <div className={`absolute inset-0 items-center justify-center pointer-events-none ${activeImage ? "hidden" : "flex"}`}>
+              {isEquipment ? (
+                <Flame className="w-16 h-16 text-brand-orange/20" />
+              ) : (
+                <Settings className="w-16 h-16 text-brand-teal/20" />
+              )}
+            </div>
+
+            {/* Prev/Next arrows — only when there's more than one photo */}
+            {gallery.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setActiveImageIdx((i) => (i - 1 + gallery.length) % gallery.length)}
+                  aria-label="Previous image"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveImageIdx((i) => (i + 1) % gallery.length)}
+                  aria-label="Next image"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+                <span className="absolute bottom-3 right-3 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded">
+                  {activeImageIdx + 1} / {gallery.length}
+                </span>
+              </>
             )}
           </div>
+
+          {/* Thumbnail strip */}
+          {gallery.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {gallery.map((img, idx) => (
+                <button
+                  key={img.id}
+                  type="button"
+                  onClick={() => setActiveImageIdx(idx)}
+                  className={`shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                    idx === activeImageIdx
+                      ? "border-brand-orange"
+                      : "border-transparent opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <img src={img.url} alt={img.altText || `${product.name} photo ${idx + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Description */}

@@ -32,6 +32,8 @@ interface Category {
   slug: string;
 }
 
+const PAGE_SIZE = 24;
+
 export default function ProductListClient({
   products,
   categories,
@@ -44,6 +46,7 @@ export default function ProductListClient({
   const [selectedType, setSelectedType] = useState("all"); // 'all' | 'EQUIPMENT' | 'PART'
   const [addedItemSlug, setAddedItemSlug] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [page, setPage] = useState(1);
 
   const activeFilterCount = (selectedType !== "all" ? 1 : 0) + (selectedCategory !== "all" ? 1 : 0) + (searchTerm ? 1 : 0);
 
@@ -61,6 +64,17 @@ export default function ProductListClient({
 
     return matchesSearch && matchesCategory && matchesType;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pagedProducts = filteredProducts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const goToPage = (p: number) => {
+    setPage(p);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
@@ -114,7 +128,7 @@ export default function ProductListClient({
                 type="text"
                 placeholder="Item name, code..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => { setSearchTerm(e.target.value); setPage(1); }}
                 className="w-full bg-slate-50 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 pl-9 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-brand-orange focus:bg-white"
               />
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
@@ -132,7 +146,7 @@ export default function ProductListClient({
               ].map((t) => (
                 <button
                   key={t.val}
-                  onClick={() => setSelectedType(t.val)}
+                  onClick={() => { setSelectedType(t.val); setPage(1); }}
                   className={`text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
                     selectedType === t.val
                       ? "bg-brand-orange/15 text-brand-orange border-l-2 border-brand-orange"
@@ -150,7 +164,7 @@ export default function ProductListClient({
             <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Categories</label>
             <div className="flex flex-col space-y-1.5">
               <button
-                onClick={() => setSelectedCategory("all")}
+                onClick={() => { setSelectedCategory("all"); setPage(1); }}
                 className={`text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
                   selectedCategory === "all"
                     ? "bg-brand-orange/15 text-brand-orange border-l-2 border-brand-orange"
@@ -162,7 +176,7 @@ export default function ProductListClient({
               {categories.map((c) => (
                 <button
                   key={c.slug}
-                  onClick={() => setSelectedCategory(c.slug)}
+                  onClick={() => { setSelectedCategory(c.slug); setPage(1); }}
                   className={`text-left px-3 py-1.5 rounded text-xs font-semibold transition-colors ${
                     selectedCategory === c.slug
                       ? "bg-brand-orange/15 text-brand-orange border-l-2 border-brand-orange"
@@ -186,7 +200,7 @@ export default function ProductListClient({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((p) => {
+            {pagedProducts.map((p) => {
               const isEquipment = p.type === "EQUIPMENT";
 
               return (
@@ -296,6 +310,55 @@ export default function ProductListClient({
                 </Link>
               );
             })}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {filteredProducts.length > PAGE_SIZE && (
+          <div className="flex items-center justify-between mt-8 text-sm">
+            <span className="text-slate-500 dark:text-slate-400 text-xs">
+              Showing {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, filteredProducts.length)} of {filteredProducts.length} items
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md text-slate-600 dark:text-slate-300 text-xs font-semibold disabled:opacity-30 disabled:cursor-not-allowed hover:border-slate-400 dark:hover:border-slate-500 transition-colors"
+              >
+                Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                .reduce<number[]>((acc, p) => {
+                  if (acc.length > 0 && p - acc[acc.length - 1] > 1) acc.push(-1); // gap marker
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((p, idx) =>
+                  p === -1 ? (
+                    <span key={`gap-${idx}`} className="px-1 text-slate-400 text-xs">…</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => goToPage(p)}
+                      className={`w-8 h-8 rounded-md text-xs font-bold transition-colors ${
+                        p === currentPage
+                          ? "bg-brand-orange text-white"
+                          : "border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400 dark:hover:border-slate-500"
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  )
+                )}
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 border border-slate-300 dark:border-slate-700 rounded-md text-slate-600 dark:text-slate-300 text-xs font-semibold disabled:opacity-30 disabled:cursor-not-allowed hover:border-slate-400 dark:hover:border-slate-500 transition-colors"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>
