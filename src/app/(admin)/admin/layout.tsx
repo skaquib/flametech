@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { LayoutDashboard, ShoppingBag, ClipboardList, Package, LogOut, Globe, ShieldAlert, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, ClipboardList, Package, LogOut, Globe, ShieldAlert, Sun, Moon, TrendingUp, Sparkles } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -64,6 +64,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Products Listing", href: "/admin/products", icon: <Package className="w-4 h-4" /> },
     { name: "Quote Requests", href: "/admin/quotes", icon: <ClipboardList className="w-4 h-4" /> },
     { name: "Direct Orders", href: "/admin/orders", icon: <ShoppingBag className="w-4 h-4" /> },
+    { name: "Growth Analytics", href: "/admin/analytics", icon: <TrendingUp className="w-4 h-4" /> },
+    { name: "Marketing", href: "/admin/marketing", icon: <Sparkles className="w-4 h-4" /> },
   ];
 
   return (
