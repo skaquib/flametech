@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
-import { Search, Flame, Settings, ShoppingCart, Check, Info, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { DEFAULT_PRODUCT_IMAGE } from "@/lib/constants";
+import { Search, ShoppingCart, Check, Info, SlidersHorizontal, ChevronDown } from "lucide-react";
 
 interface Product {
   id: string;
@@ -215,27 +216,12 @@ export default function ProductListClient({
                       {p.category.name}
                     </div>
                     
-                    {p.image ? (
-                      <img
-                        src={p.image}
-                        alt={p.name}
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                          if (fallback) fallback.style.display = 'flex';
-                        }}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : null}
-
-                    {/* Fallback icon — shown directly when there's no image on file, or if the real image fails to load */}
-                    <div className={`absolute inset-0 items-center justify-center pointer-events-none ${p.image ? "hidden" : "flex"}`}>
-                      {isEquipment ? (
-                        <Flame className="w-10 h-10 text-brand-orange/20" />
-                      ) : (
-                        <Settings className="w-10 h-10 text-brand-teal/20" />
-                      )}
-                    </div>
+                    <img
+                      src={p.image || DEFAULT_PRODUCT_IMAGE}
+                      alt={p.name}
+                      onError={(e) => { e.currentTarget.src = DEFAULT_PRODUCT_IMAGE; }}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
 
                     {/* Badge flow type */}
                     <div className="absolute bottom-2 right-2 bg-slate-200 dark:bg-[#060b13] border border-slate-300 dark:border-slate-800 rounded px-2 py-0.5 text-[8px] font-bold text-slate-700 dark:text-slate-400">

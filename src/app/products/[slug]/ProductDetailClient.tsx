@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useCartStore } from "@/store/cart";
 import { Flame, Settings, ShoppingCart, Check, FileText, Send, HelpCircle, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
+import { DEFAULT_PRODUCT_IMAGE } from "@/lib/constants";
 
 interface ProductSpec {
   label: string;
@@ -61,7 +62,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
       ];
 
   const getWhatsAppLink = (faqQuestion: string) => {
-    const phone = "919768417740";
+    const phone = "919869588728";
     const text = `Hello FlameTech Engineering! I am inquiring about the product *${product.name}* (Code: *${product.itemCode || "N/A"}*). I would like to ask: ${faqQuestion}`;
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   };
@@ -146,7 +147,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         setQuoteSubmitted(true);
         // WhatsApp is a bonus notification channel, not the record of truth —
         // only opened once we know the lead is actually saved.
-        const phone = "919768417740";
+        const phone = "919869588728";
         const text = `Hello FlameTech Engineering! I would like to request a quote for *${product.name}* (Code: *${product.itemCode || "N/A"}*).
 
 *My Details:*
@@ -185,27 +186,13 @@ ${quoteForm.message || "N/A"}`;
         {/* Product Image Gallery */}
         <div className="space-y-3">
           <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center group shadow-md">
-            {activeImage ? (
-              <img
-                key={activeImage.id}
-                src={activeImage.url}
-                alt={activeImage.altText || product.name}
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (fallback) fallback.style.display = 'flex';
-                }}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
-              />
-            ) : null}
-            {/* Fallback Icon — shown directly when there's no image on file, or if the real image fails to load */}
-            <div className={`absolute inset-0 items-center justify-center pointer-events-none ${activeImage ? "hidden" : "flex"}`}>
-              {isEquipment ? (
-                <Flame className="w-16 h-16 text-brand-orange/20" />
-              ) : (
-                <Settings className="w-16 h-16 text-brand-teal/20" />
-              )}
-            </div>
+            <img
+              key={activeImage?.id ?? "placeholder"}
+              src={activeImage?.url || DEFAULT_PRODUCT_IMAGE}
+              alt={activeImage?.altText || product.name}
+              onError={(e) => { e.currentTarget.src = DEFAULT_PRODUCT_IMAGE; }}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-102"
+            />
 
             {/* Prev/Next arrows — only when there's more than one photo */}
             {gallery.length > 1 && (
@@ -343,7 +330,7 @@ ${quoteForm.message || "N/A"}`;
                   <div className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/60 rounded-lg p-3 text-xs text-red-700 dark:text-red-400 space-y-1.5">
                     <p className="font-bold">We couldn't save your request — please try again, or reach us directly:</p>
                     <a
-                      href={`https://wa.me/919768417740?text=${encodeURIComponent(`Hello FlameTech Engineering! I would like to request a quote for *${product.name}* (Code: *${product.itemCode || "N/A"}*). My phone: ${quoteForm.phone || "N/A"}`)}`}
+                      href={`https://wa.me/919869588728?text=${encodeURIComponent(`Hello FlameTech Engineering! I would like to request a quote for *${product.name}* (Code: *${product.itemCode || "N/A"}*). My phone: ${quoteForm.phone || "N/A"}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-block font-bold text-emerald-600 dark:text-emerald-400 underline"
@@ -372,7 +359,7 @@ ${quoteForm.message || "N/A"}`;
                       required
                       value={quoteForm.phone}
                       onChange={(e) => setQuoteForm({ ...quoteForm, phone: e.target.value })}
-                      placeholder="e.g. +91 97684 17740"
+                      placeholder="e.g. +91 98695 88728"
                       className="w-full bg-slate-50 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-brand-orange focus:bg-white"
                     />
                   </div>

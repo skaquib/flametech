@@ -112,9 +112,6 @@ function CustomerLoginForm() {
           </Link>
         </div>
         <div>
-          Demo Accounts: <span className="text-slate-900 dark:text-white font-bold">customer@gmail.com</span> / Password: <span className="text-slate-900 dark:text-white font-bold">Customer123!</span>
-        </div>
-        <div>
           Are you an administrator?{" "}
           <Link href="/admin-login" className="text-brand-orange hover:underline font-semibold">
             Admin Portal

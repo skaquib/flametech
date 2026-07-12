@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Search, Flame, Settings, Edit3, Circle, CircleCheck, AlertTriangle } from "lucide-react";
+import { DEFAULT_PRODUCT_IMAGE } from "@/lib/constants";
 
 interface Product {
   id: string;
@@ -128,13 +129,12 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
                     {/* Thumbnail */}
                     <td className="px-6 py-4">
                       <div className="w-12 h-12 rounded-md bg-slate-100 dark:bg-brand-slate/30 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden shrink-0">
-                        {p.image ? (
-                          <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
-                        ) : isEquipment ? (
-                          <Flame className="w-5 h-5 text-brand-orange/30" />
-                        ) : (
-                          <Settings className="w-5 h-5 text-brand-teal/30" />
-                        )}
+                        <img
+                          src={p.image || DEFAULT_PRODUCT_IMAGE}
+                          alt={p.name}
+                          onError={(e) => { e.currentTarget.src = DEFAULT_PRODUCT_IMAGE; }}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                     </td>
 

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Plus, Trash2, HelpCircle } from "lucide-react";
+import { DEFAULT_PRODUCT_IMAGE } from "@/lib/constants";
 
 export default function CreateProductPage() {
   const router = useRouter();
@@ -217,15 +218,18 @@ export default function CreateProductPage() {
           <h3 className="text-slate-900 dark:text-white font-bold text-sm border-b border-slate-200 dark:border-brand-slate/30 pb-2">Product Image</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
             {/* Image Preview Container */}
-            <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center">
-              {form.image ? (
+            <div className="space-y-1.5">
+              <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center">
                 <img
-                  src={form.image}
+                  src={form.image || DEFAULT_PRODUCT_IMAGE}
                   alt="Product preview"
                   className="w-full h-full object-contain p-2"
                 />
-              ) : (
-                <span className="text-xs text-slate-500 dark:text-slate-400 italic">No image uploaded</span>
+              </div>
+              {!form.image && (
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 italic">
+                  No image uploaded yet — customers see this default placeholder.
+                </p>
               )}
             </div>
 
