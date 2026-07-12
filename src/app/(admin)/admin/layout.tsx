@@ -4,19 +4,25 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { LayoutDashboard, ShoppingBag, ClipboardList, Package, LogOut, Globe, ShieldAlert, Sun, Moon, TrendingUp, Sparkles } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, ClipboardList, Package, LogOut, Globe, ShieldAlert, Sun, Moon, TrendingUp, Sparkles, Menu, X } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session, status } = useSession();
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const root = document.documentElement;
     const initialTheme = root.classList.contains("dark") ? "dark" : "light";
     setTheme(initialTheme);
   }, []);
+
+  // Auto-close the mobile sidebar overlay whenever the route changes
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   const toggleTheme = () => {
     const root = document.documentElement;
@@ -70,22 +76,46 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className={`h-screen overflow-hidden bg-slate-50 dark:bg-brand-dark text-slate-900 dark:text-slate-100 flex text-left transition-colors duration-300`}>
+      {/* Mobile backdrop — closes the sidebar on tap outside it */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          aria-hidden="true"
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 h-screen sticky top-0 bg-white dark:bg-[#0a1128] border-r border-slate-200 dark:border-brand-slate/40 flex flex-col justify-between shrink-0 overflow-y-auto transition-colors duration-300">
+      <aside
+        className={`w-64 h-screen fixed lg:sticky top-0 left-0 z-50 bg-white dark:bg-[#0a1128] border-r border-slate-200 dark:border-brand-slate/40 flex flex-col justify-between shrink-0 overflow-y-auto transition-transform duration-300 ease-in-out lg:transition-colors lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
         <div className="p-6 space-y-8">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="bg-brand-orange p-1.5 rounded-lg flex items-center justify-center text-white font-bold">
-              FT
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="bg-brand-orange p-1.5 rounded-lg flex items-center justify-center text-white font-bold">
+                FT
+              </div>
+              <div>
+                <span className="font-extrabold text-sm tracking-wider text-slate-800 dark:text-white">
+                  FLAME<span className="text-brand-orange">TECH</span>
+                </span>
+                <span className="block text-[8px] uppercase tracking-widest text-slate-500 font-bold leading-none">
+                  Admin Panel
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="font-extrabold text-sm tracking-wider text-slate-800 dark:text-white">
-                FLAME<span className="text-brand-orange">TECH</span>
-              </span>
-              <span className="block text-[8px] uppercase tracking-widest text-slate-500 font-bold leading-none">
-                Admin Panel
-              </span>
-            </div>
+            {/* Close button — mobile only */}
+            <button
+              onClick={() => setSidebarOpen(false)}
+              type="button"
+              className="lg:hidden p-1.5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Links list */}
@@ -130,13 +160,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* Main panel container */}
-      <div className="flex-1 flex flex-col overflow-y-auto">
+      <div className="flex-1 flex flex-col overflow-y-auto min-w-0">
         {/* Header toolbar */}
-        <header className="h-16 border-b border-slate-200 dark:border-brand-slate/40 flex items-center justify-between px-8 bg-white/70 dark:bg-[#0a1128]/35 backdrop-blur transition-colors duration-300">
-          <div className="text-slate-500 dark:text-slate-400 text-xs font-semibold">
-            Logged in: <span className="text-slate-900 dark:text-white font-bold">{session.user.name}</span> ({session.user.role})
+        <header className="h-16 border-b border-slate-200 dark:border-brand-slate/40 flex items-center justify-between px-4 sm:px-8 bg-white/70 dark:bg-[#0a1128]/35 backdrop-blur transition-colors duration-300">
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Sidebar open button — mobile only */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              type="button"
+              className="lg:hidden p-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0"
+              aria-label="Open sidebar"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+            <div className="text-slate-500 dark:text-slate-400 text-xs font-semibold truncate">
+              Logged in: <span className="text-slate-900 dark:text-white font-bold">{session.user.name}</span> ({session.user.role})
+            </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 shrink-0">
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
@@ -158,7 +199,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Dashboard Content area */}
-        <main className="p-8 flex-1 bg-slate-50 dark:bg-brand-dark transition-colors duration-300">{children}</main>
+        <main className="p-4 sm:p-6 lg:p-8 flex-1 bg-slate-50 dark:bg-brand-dark transition-colors duration-300 overflow-x-auto">{children}</main>
       </div>
     </div>
   );

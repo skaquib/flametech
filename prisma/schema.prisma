@@ -201,3 +201,22 @@ model AMCContract {
   nextDueDate   DateTime
   isActive      Boolean  @default(true)
 }
+
+model MarketingChatSession {
+  id        String                 @id @default(cuid())
+  title     String?
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+  messages  MarketingChatMessage[]
+}
+
+model MarketingChatMessage {
+  id        String               @id @default(cuid())
+  sessionId String
+  session   MarketingChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      String               // "user" | "assistant"
+  content   String               @db.Text
+  createdAt DateTime             @default(now())
+
+  @@index([sessionId])
+}
