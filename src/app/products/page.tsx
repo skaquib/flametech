@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Search, Flame, Settings, ShoppingCart, Info, Wrench, Shield } from "lucide-react";
@@ -6,6 +7,26 @@ import ProductListClient from "./ProductListClient";
 
 // Force dynamic so connection errors don't crash static exports if DB isn't configured yet
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Industrial Burner Catalog — Gas & Oil Burners, Control Panels, Spares",
+  description: "Browse FlameTech Engineering's full B2B catalog: FT-03 to FT-25 gas burners, oil burners, automatic control panels, and spare parts (solenoid valves, ignition electrodes, flame sensors). In-stock, ready to ship across India.",
+  keywords: [
+    "industrial gas burner catalog",
+    "buy burner spare parts online",
+    "gas solenoid valve India",
+    "ignition electrode set",
+    "flame sensor photocell",
+    "burner control panel price",
+  ],
+  alternates: { canonical: "/products" },
+  openGraph: {
+    title: "Industrial Burner Catalog | FlameTech Engineering",
+    description: "FT-03 to FT-25 gas burners, oil burners, control panels, and spare parts — B2B pricing and instant quotes.",
+    url: "/products",
+    type: "website",
+  },
+};
 
 // High fidelity fallback/mock data in case Postgres isn't running yet
 const fallbackProducts = [

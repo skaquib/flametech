@@ -42,7 +42,7 @@ export default function AmcPageClient({ amcProductId }: { amcProductId: string |
   const total = subtotal + gstAmount;
 
   const whatsappHref = (text: string) =>
-    `https://wa.me/919768417740?text=${encodeURIComponent(text)}`;
+    `https://wa.me/919869588728?text=${encodeURIComponent(text)}`;
 
   const handleAddToCart = () => {
     addItem({
@@ -299,7 +299,7 @@ export default function AmcPageClient({ amcProductId }: { amcProductId: string |
                       required
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      placeholder="e.g. +91 97684 17740"
+                      placeholder="e.g. +91 98695 88728"
                       className="w-full bg-slate-50 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-1.5 px-3 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:bg-white"
                     />
                   </div>

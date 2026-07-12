@@ -120,20 +120,20 @@ export default function Footer() {
                 </li>
                 <li className="flex items-center space-x-3">
                   <Phone className="w-4 h-4 text-brand-orange shrink-0" />
-                  <a href="tel:+919768417740" className="hover:text-brand-orange dark:hover:text-white transition-colors text-slate-700 dark:text-slate-300">
-                    +91 97684 17740
+                  <a href="tel:+919869588728" className="hover:text-brand-orange dark:hover:text-white transition-colors text-slate-700 dark:text-slate-300">
+                    +91 98695 88728
                   </a>
                 </li>
                 <li className="flex items-center space-x-3">
                   <Mail className="w-4 h-4 text-brand-orange shrink-0" />
-                  <a href="mailto:info@flametech.com" className="hover:text-brand-orange dark:hover:text-white transition-colors text-slate-700 dark:text-slate-300">
-                    info@flametech.com
+                  <a href="mailto:info@flametechengineering.com" className="hover:text-brand-orange dark:hover:text-white transition-colors text-slate-700 dark:text-slate-300">
+                    info@flametechengineering.com
                   </a>
                 </li>
               </ul>
               <div className="pt-2">
                 <a
-                  href="https://wa.me/919768417740?text=Hello%20FlameTech%20Engineering,%20I%20would%20like%20to%20inquire%20about%20your%20burners."
+                  href="https://wa.me/919869588728?text=Hello%20FlameTech%20Engineering,%20I%20would%20like%20to%20inquire%20about%20your%20burners."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-2 px-4 py-2 bg-emerald-700 text-white rounded-md text-xs font-semibold hover:bg-emerald-600 transition-all shadow-sm"
@@ -157,7 +157,7 @@ export default function Footer() {
 
       {/* Floating WhatsApp Widget */}
       <a
-        href="https://wa.me/919768417740?text=Hello%20FlameTech%20Engineering,%20I%20have%20an%20inquiry."
+        href="https://wa.me/919869588728?text=Hello%20FlameTech%20Engineering,%20I%20have%20an%20inquiry."
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-5 right-4 sm:bottom-8 sm:right-8 z-50 flex items-center justify-center bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all text-white p-3 sm:p-3.5 rounded-full shadow-2xl group cursor-pointer"

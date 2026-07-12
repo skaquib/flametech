@@ -152,7 +152,7 @@ function SuccessContent() {
               Shop No. 9, Ground Floor, Paradise Apts.,<br />
               15 Wanja Wadi, Mahim (W), Mumbai, Maharashtra - 400 016<br />
               State Code: 27 (Maharashtra)<br />
-              Contact: +91 97684 17740 | info@flametech.com
+              Contact: +91 98695 88728 | info@flametechengineering.com
             </div>
           </div>
 

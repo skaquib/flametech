@@ -73,7 +73,7 @@ async function main() {
   console.log("Industries created.");
 
   // 4. Users
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@flametech.com";
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@flametechengineering.com";
   const adminPassword = process.env.ADMIN_PASSWORD || "AdminFlameTech123!";
   
   const adminHash = await bcrypt.hash(adminPassword, 10);
@@ -83,7 +83,7 @@ async function main() {
     data: {
       name: "FlameTech Admin",
       email: adminEmail,
-      phone: "+919768417740",
+      phone: "+919869588728",
       passwordHash: adminHash,
       role: Role.ADMIN,
       company: "FlameTech Engineering",

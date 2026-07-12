@@ -77,7 +77,7 @@ function LoginForm() {
               required
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="admin@flametech.com"
+              placeholder="admin@flametechengineering.com"
               className="w-full bg-slate-50 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 pl-9 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange focus:bg-white"
             />
             <Mail className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-3" />

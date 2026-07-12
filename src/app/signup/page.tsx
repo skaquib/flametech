@@ -134,7 +134,7 @@ export default function SignupPage() {
                 required
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="+91 97684 17740"
+                placeholder="+91 98695 88728"
                 className="w-full bg-slate-50 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 pl-9 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange focus:bg-white"
               />
               <Phone className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-3" />

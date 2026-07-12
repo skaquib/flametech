@@ -98,7 +98,7 @@ export default function CookiesPage() {
               </p>
               <p className="text-xs flex items-center space-x-1.5">
                 <Mail className="w-3.5 h-3.5 text-brand-orange" />
-                <a href="mailto:info@flametech.com" className="hover:text-brand-orange transition-colors">info@flametech.com</a>
+                <a href="mailto:info@flametechengineering.com" className="hover:text-brand-orange transition-colors">info@flametechengineering.com</a>
               </p>
             </div>
           </section>

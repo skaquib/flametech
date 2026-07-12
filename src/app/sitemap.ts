@@ -1,0 +1,52 @@
+import type { MetadataRoute } from "next";
+import prisma from "@/lib/prisma";
+
+const SITE_URL = "https://flametechengineering.com";
+
+const fallbackSlugs = [
+  "ft-03",
+  "ft-05",
+  "ft-10",
+  "ft-15",
+  "ft-20",
+  "ft-25",
+  "semi-auto-control-panel",
+  "gas-solenoid-valve-1-2",
+  "ignition-electrode-set",
+  "flame-sensor-photocell",
+];
+
+async function getProductSlugs(): Promise<string[]> {
+  try {
+    const products = await prisma.product.findMany({ select: { slug: true } });
+    if (products.length > 0) {
+      return products.map((p) => p.slug);
+    }
+    return fallbackSlugs;
+  } catch {
+    return fallbackSlugs;
+  }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const slugs = await getProductSlugs();
+
+  const staticRoutes: MetadataRoute.Sitemap = [
+    { url: `${SITE_URL}/`, changeFrequency: "weekly", priority: 1 },
+    { url: `${SITE_URL}/products`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE_URL}/services/amc`, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${SITE_URL}/about`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/contact`, changeFrequency: "monthly", priority: 0.6 },
+    { url: `${SITE_URL}/terms`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/privacy`, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${SITE_URL}/cookies`, changeFrequency: "yearly", priority: 0.2 },
+  ];
+
+  const productRoutes: MetadataRoute.Sitemap = slugs.map((slug) => ({
+    url: `${SITE_URL}/products/${slug}`,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...productRoutes];
+}

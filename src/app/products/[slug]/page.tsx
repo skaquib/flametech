@@ -1,4 +1,5 @@
 import React from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
@@ -249,6 +250,43 @@ interface PageParams {
   params: Promise<{ slug: string }>;
 }
 
+const SITE_URL = "https://flametechengineering.com";
+
+export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+
+  if (!product) {
+    return { title: "Product Not Found" };
+  }
+
+  const title = `${product.name}${product.itemCode ? ` (${product.itemCode})` : ""}`;
+  const description =
+    (product as any).shortDesc ||
+    product.description ||
+    `Buy ${product.name} from FlameTech Engineering — B2B industrial burner and spare parts manufacturer.`;
+
+  return {
+    title,
+    description,
+    keywords: [
+      product.name,
+      product.itemCode || undefined,
+      product.category?.name,
+      "buy industrial burner online",
+      "FlameTech Engineering spare parts",
+    ].filter(Boolean) as string[],
+    alternates: { canonical: `/products/${product.slug}` },
+    openGraph: {
+      title,
+      description,
+      url: `/products/${product.slug}`,
+      type: "website",
+      images: (product as any).image ? [`${SITE_URL}${(product as any).image}`] : undefined,
+    },
+  };
+}
+
 export default async function ProductDetailPage({ params }: PageParams) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
@@ -257,8 +295,33 @@ export default async function ProductDetailPage({ params }: PageParams) {
     notFound();
   }
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    sku: product.itemCode || undefined,
+    description: product.description || (product as any).shortDesc || product.name,
+    category: product.category?.name,
+    brand: { "@type": "Brand", name: "FlameTech Engineering" },
+    image: (product as any).image ? `${SITE_URL}${(product as any).image}` : undefined,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "INR",
+      price: product.price ?? undefined,
+      availability:
+        product.stockQty && product.stockQty > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/PreOrder",
+      url: `${SITE_URL}/products/${product.slug}`,
+    },
+  };
+
   return (
     <div className="pt-24 min-h-screen bg-slate-50 dark:bg-brand-dark pb-20 text-left">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back navigation */}
         <div className="mb-8">
