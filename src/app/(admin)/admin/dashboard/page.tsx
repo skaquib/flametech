@@ -7,41 +7,30 @@ export const dynamic = "force-dynamic";
 
 async function getDashboardData() {
   try {
-    const totalQuotes = await prisma.quoteRequest.count();
-    const newLeadsCount = await prisma.quoteRequest.count({ where: { status: "NEW" } });
-    const activeOrders = await prisma.order.count({
-      where: { status: { notIn: ["DELIVERED", "CANCELLED"] } },
-    });
-    const paidOrders = await prisma.order.findMany({
-      where: { status: "PAID" },
-      select: { total: true },
-    });
+    // These 8 queries are all independent — running them sequentially was paying
+    // the full DB round-trip cost 8 times over (each ~1.5-2s), adding up to the
+    // 12s+ dashboard load. Promise.all runs them concurrently instead.
+    const [
+      totalQuotes,
+      newLeadsCount,
+      activeOrders,
+      paidOrders,
+      lowStockCount,
+      recentQuotes,
+      recentOrders,
+      recentViews,
+    ] = await Promise.all([
+      prisma.quoteRequest.count(),
+      prisma.quoteRequest.count({ where: { status: "NEW" } }),
+      prisma.order.count({ where: { status: { notIn: ["DELIVERED", "CANCELLED"] } } }),
+      prisma.order.findMany({ where: { status: "PAID" }, select: { total: true } }),
+      prisma.product.count({ where: { type: "PART", stockQty: { lte: 20 } } }),
+      prisma.quoteRequest.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { product: true } }),
+      prisma.order.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { user: true } }),
+      prisma.productView.findMany({ take: 8, orderBy: { createdAt: "desc" }, include: { product: true, user: true } }),
+    ]);
+
     const totalRevenue = paidOrders.reduce((sum, o) => sum + o.total, 0);
-
-    const lowStockCount = await prisma.product.count({
-      where: {
-        type: "PART",
-        stockQty: { lte: 20 },
-      },
-    });
-
-    const recentQuotes = await prisma.quoteRequest.findMany({
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      include: { product: true },
-    });
-
-    const recentOrders = await prisma.order.findMany({
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      include: { user: true },
-    });
-
-    const recentViews = await prisma.productView.findMany({
-      take: 8,
-      orderBy: { createdAt: "desc" },
-      include: { product: true, user: true },
-    });
 
     return {
       metrics: {
