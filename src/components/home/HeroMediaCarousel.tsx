@@ -13,7 +13,7 @@ const SLIDES: Slide[] = [
   { src: "/images/Gemini_Generated_Image_m3fdh7m3fdh7m3fd.png", alt: "FlameTech dual-solenoid gas burner — studio product shot" },
   { src: "/images/Gemini_Generated_Image_r9kgvzr9kgvzr9kg.png", alt: "FlameTech FT.10 burner with sequence controller — studio product shot" },
   { src: "/images/Gemini_Generated_Image_98vlhh98vlhh98vl.png", alt: "FlameTech gas burner combustion head — studio product shot" },
-
+  { src: "/images/Gemini_Generated_Image_ne1i47ne1i47ne1i.png", alt: "FlameTech Switch Board — studio product shot" },
 ];
 
 const SLIDE_DURATION_MS = 3500;
