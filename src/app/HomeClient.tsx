@@ -6,6 +6,7 @@ import { Flame, ShieldCheck, Settings, Users, ArrowRight, Activity, Cpu, Wrench,
 import { motion, AnimatePresence } from "framer-motion";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import HeroMediaCarousel from "@/components/home/HeroMediaCarousel";
 
 export default function HomeClient() {
   const [selectedBurner, setSelectedBurner] = useState("ft-03");
@@ -348,6 +349,26 @@ export default function HomeClient() {
               <span className="w-1.5 h-1.5 rounded-full bg-brand-orange animate-ping"></span>
               <span>Diagnostics active</span>
             </div>
+
+            {/* Video — standalone, on top. Natural aspect ratio (h-auto) so nothing is ever cropped. */}
+            <div className="relative w-full rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10 bg-black">
+              <video
+                className="w-full h-auto block"
+                src="/images/in_the_end_wwwflametechengine.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                disablePictureInPicture
+                controlsList="nodownload noplaybackrate nofullscreen"
+                preload="auto"
+              />
+              <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-black/60 backdrop-blur-sm rounded-full text-white text-[9px] font-bold uppercase tracking-widest">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                <span>Live Product Footage</span>
+              </div>
+            </div>
+
             <h1 className="text-3xl font-black tracking-tight leading-[1.05] text-slate-900 dark:text-white uppercase font-sans">
               The Next <br />
               Generation of <br />
@@ -358,14 +379,6 @@ export default function HomeClient() {
             <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed max-w-sm">
               Introducing the FT Series. Modular high-efficiency burners engineered for heavy-industry process kilns and steam boilers. Designed to achieve up to 15% fuel reduction.
             </p>
-
-            <div className="w-full flex items-center justify-center py-4">
-              <img
-                src="/images/hero-burner.png"
-                alt="FlameTech FT-25 High-Efficiency Burner"
-                className="max-h-[220px] w-auto object-contain filter drop-shadow-[0_25px_60px_rgba(242,100,25,0.15)]"
-              />
-            </div>
 
             <div className="flex flex-wrap gap-3">
               <Link
@@ -381,9 +394,12 @@ export default function HomeClient() {
                 SLA Service
               </Link>
             </div>
-
-         
           </div>
+        </div>
+
+        {/* Image carousel — its own block, fully below the hero content above (mobile only) */}
+        <div className="lg:hidden px-4 sm:px-6 pb-10 relative z-10">
+          <HeroMediaCarousel />
         </div>
 
         {/* Sticky Viewport (desktop scroll-scrubbed showcase) */}
@@ -684,6 +700,33 @@ export default function HomeClient() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Showcase — desktop only; mobile already sees the video inside the hero carousel above */}
+      <section className="hidden lg:block bg-slate-50 dark:bg-brand-navy/35 py-20 border-b border-slate-200 dark:border-brand-slate/40 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
+            <h2 className="text-xs uppercase font-extrabold text-brand-orange tracking-widest">See It In Action</h2>
+            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Engineered for Real-World Combustion</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
+              A closer look at the FlameTech engine — precision-built for continuous, high-efficiency industrial operation.
+            </p>
+          </div>
+
+          <div className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10">
+            <video
+              className="w-full h-auto block"
+              src="/images/in_the_end_wwwflametechengine.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              disablePictureInPicture
+              controlsList="nodownload noplaybackrate nofullscreen"
+              preload="auto"
+            />
           </div>
         </div>
       </section>
@@ -1082,33 +1125,6 @@ export default function HomeClient() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <p className="text-slate-400 dark:text-slate-500 text-xs mt-3">35+ products across 5 categories · Spare parts · Services · AMC Contracts</p>
-          </div>
-        </div>
-      </section>
-
-      {/* Video Showcase */}
-      <section className="bg-slate-50 dark:bg-brand-navy/35 py-20 border-b border-slate-200 dark:border-brand-slate/40 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-4 mb-12">
-            <h2 className="text-xs uppercase font-extrabold text-brand-orange tracking-widest">See It In Action</h2>
-            <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">Engineered for Real-World Combustion</h3>
-            <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">
-              A closer look at the FlameTech engine — precision-built for continuous, high-efficiency industrial operation.
-            </p>
-          </div>
-
-          <div className="relative max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-white/10">
-            <video
-              className="w-full h-auto block"
-              src="/images/in_the_end_wwwflametechengine.mp4"
-              autoPlay
-              muted
-              loop
-              playsInline
-              disablePictureInPicture
-              controlsList="nodownload noplaybackrate nofullscreen"
-              preload="auto"
-            />
           </div>
         </div>
       </section>
