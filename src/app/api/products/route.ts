@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
@@ -65,6 +66,7 @@ export const POST = auth(async function POST(req) {
       },
     });
 
+    revalidateTag("products", { expire: 0 });
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error: any) {
     console.error("API Create product error:", error);

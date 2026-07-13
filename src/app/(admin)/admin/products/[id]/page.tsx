@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Save, Plus, Trash2, Loader2 } from "lucide-react";
 import { DEFAULT_PRODUCT_IMAGE } from "@/lib/constants";
+import { resizeImageFile } from "@/lib/imageResize";
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -53,7 +54,10 @@ export default function EditProductPage() {
     setUploadError(null);
     try {
       const formData = new FormData();
-      Array.from(fileList).forEach((file) => formData.append("files", file));
+      for (const file of Array.from(fileList)) {
+        const resized = await resizeImageFile(file).catch(() => file);
+        formData.append("files", resized);
+      }
       const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
       const data = await res.json();
       if (!res.ok) {

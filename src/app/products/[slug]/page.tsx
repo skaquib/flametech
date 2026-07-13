@@ -2,6 +2,7 @@ import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import prisma from "@/lib/prisma";
 import { Flame, Settings, ArrowLeft, ShieldAlert, FileText, CheckCircle2 } from "lucide-react";
 import ProductDetailClient from "./ProductDetailClient";
@@ -228,25 +229,31 @@ const fallbackProducts = [
   },
 ];
 
-async function getProductBySlug(slug: string) {
-  try {
-    const product = await prisma.product.findUnique({
-      where: { slug },
-      include: {
-        category: true,
-        specs: true,
-        images: { orderBy: { position: "asc" } },
-      },
-    });
-    if (!product) {
+// Prisma doesn't go through `fetch`, so the route's `revalidate` export alone does
+// nothing for this query — unstable_cache is what actually caches it across requests.
+const getProductBySlug = unstable_cache(
+  async (slug: string) => {
+    try {
+      const product = await prisma.product.findUnique({
+        where: { slug },
+        include: {
+          category: true,
+          specs: true,
+          images: { orderBy: { position: "asc" } },
+        },
+      });
+      if (!product) {
+        return fallbackProducts.find((p) => p.slug === slug) || null;
+      }
+      return product;
+    } catch (error) {
+      console.error("Database connection failed. Loading fallback product.", error);
       return fallbackProducts.find((p) => p.slug === slug) || null;
     }
-    return product;
-  } catch (error) {
-    console.error("Database connection failed. Loading fallback product.", error);
-    return fallbackProducts.find((p) => p.slug === slug) || null;
-  }
-}
+  },
+  ["product-by-slug"],
+  { revalidate: 120, tags: ["products"] }
+);
 
 interface PageParams {
   params: Promise<{ slug: string }>;

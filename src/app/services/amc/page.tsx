@@ -1,10 +1,26 @@
 import type { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 import prisma from "@/lib/prisma";
 import AmcPageClient from "./AmcPageClient";
 
 // Public marketing page — cache and revalidate every 5 minutes rather than
 // hitting the DB on every visit for a value that barely ever changes.
 export const revalidate = 300;
+
+// Prisma doesn't go through `fetch`, so the `revalidate` export above alone does
+// nothing for this query — unstable_cache is what actually caches it across requests.
+const getAmcProductId = unstable_cache(
+  async () => {
+    try {
+      const product = await prisma.product.findUnique({ where: { slug: "amc-service-contract" } });
+      return product?.id ?? null;
+    } catch {
+      return null;
+    }
+  },
+  ["amc-product-id"],
+  { revalidate: 300, tags: ["products"] }
+);
 
 export const metadata: Metadata = {
   title: "Annual Maintenance Contract (AMC) for Industrial Burners",
@@ -26,13 +42,6 @@ export const metadata: Metadata = {
 };
 
 export default async function AmcPage() {
-  let amcProductId: string | null = null;
-  try {
-    const product = await prisma.product.findUnique({ where: { slug: "amc-service-contract" } });
-    amcProductId = product?.id ?? null;
-  } catch {
-    amcProductId = null;
-  }
-
+  const amcProductId = await getAmcProductId();
   return <AmcPageClient amcProductId={amcProductId} />;
 }

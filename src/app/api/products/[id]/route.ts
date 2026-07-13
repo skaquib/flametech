@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
@@ -86,6 +87,7 @@ export const PATCH = auth(async function PATCH(req, context: any) {
       data: updateData,
     });
 
+    revalidateTag("products", { expire: 0 });
     return NextResponse.json(updated);
   } catch (error: any) {
     console.error("PATCH product update error:", error);
@@ -107,6 +109,7 @@ export const DELETE = auth(async function DELETE(req, context: any) {
     const deleted = await prisma.product.delete({
       where: { id },
     });
+    revalidateTag("products", { expire: 0 });
     return NextResponse.json(deleted);
   } catch (error: any) {
     console.error("DELETE product error:", error);

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { uploadImageBuffer } from "@/lib/supabaseStorage";
 
-const MAX_FILE_BYTES = 8 * 1024 * 1024; // 8MB per file — plenty for product photos, keeps requests small
+// Vercel serverless functions reject request bodies over ~4.5MB at the platform
+// level (a 413 before this code even runs) — keep the app-level check safely
+// under that so a legible error can actually be returned instead.
+const MAX_FILE_BYTES = 4 * 1024 * 1024; // 4MB per file
 
 export const POST = auth(async function POST(req) {
   const isLoggedIn = !!req.auth;
@@ -22,7 +25,7 @@ export const POST = auth(async function POST(req) {
     const urls: string[] = [];
     for (const file of files) {
       if (file.size > MAX_FILE_BYTES) {
-        return NextResponse.json({ error: `"${file.name}" is too large (max 8MB per image).` }, { status: 400 });
+        return NextResponse.json({ error: `"${file.name}" is too large (max 4MB per image after compression).` }, { status: 400 });
       }
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);

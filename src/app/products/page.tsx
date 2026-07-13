@@ -1,6 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { unstable_cache } from "next/cache";
 import prisma from "@/lib/prisma";
 import { Search, Flame, Settings, ShoppingCart, Info, Wrench, Shield } from "lucide-react";
 import ProductListClient from "./ProductListClient";
@@ -169,43 +170,53 @@ const fallbackProducts = [
   },
 ];
 
-async function getProducts() {
-  try {
-    const products = await prisma.product.findMany({
-      where: { isActive: true },
-      include: {
-        category: true,
-        specs: true,
-      },
-    });
+// Prisma doesn't go through `fetch`, so the route's `revalidate` export alone does
+// nothing for these queries — unstable_cache is what actually caches them across requests.
+const getProducts = unstable_cache(
+  async () => {
+    try {
+      const products = await prisma.product.findMany({
+        where: { isActive: true },
+        include: {
+          category: true,
+          specs: true,
+        },
+      });
 
-    if (products.length === 0) return fallbackProducts;
-    return products;
-  } catch (error) {
-    console.error("Database connection failed. Falling back to mock data.", error);
-    return fallbackProducts;
-  }
-}
+      if (products.length === 0) return fallbackProducts;
+      return products;
+    } catch (error) {
+      console.error("Database connection failed. Falling back to mock data.", error);
+      return fallbackProducts;
+    }
+  },
+  ["products-list"],
+  { revalidate: 120, tags: ["products"] }
+);
 
-async function getCategories() {
-  try {
-    const categories = await prisma.category.findMany();
-    if (categories.length === 0) {
+const getCategories = unstable_cache(
+  async () => {
+    try {
+      const categories = await prisma.category.findMany();
+      if (categories.length === 0) {
+        return [
+          { name: "Gas Burners", slug: "gas-burners" },
+          { name: "Control Panels", slug: "control-panels" },
+          { name: "Spare Parts & Accessories", slug: "spare-parts" },
+        ];
+      }
+      return categories;
+    } catch (error) {
       return [
         { name: "Gas Burners", slug: "gas-burners" },
         { name: "Control Panels", slug: "control-panels" },
         { name: "Spare Parts & Accessories", slug: "spare-parts" },
       ];
     }
-    return categories;
-  } catch (error) {
-    return [
-      { name: "Gas Burners", slug: "gas-burners" },
-      { name: "Control Panels", slug: "control-panels" },
-      { name: "Spare Parts & Accessories", slug: "spare-parts" },
-    ];
-  }
-}
+  },
+  ["categories-list"],
+  { revalidate: 300, tags: ["categories"] }
+);
 
 export default async function ProductsPage() {
   const products = await getProducts();

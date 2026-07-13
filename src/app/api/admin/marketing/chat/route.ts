@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getLeadsWithFollowUpStatus } from "@/lib/leads";
@@ -92,6 +93,7 @@ async function execCreateProduct(args: any) {
     },
   });
 
+  revalidateTag("products", { expire: 0 });
   return { success: true, id: product.id, slug: product.slug, name: product.name };
 }
 
@@ -110,6 +112,7 @@ async function execUpdateProduct(args: any) {
   if (args.isActive !== undefined) data.isActive = args.isActive;
 
   const updated = await prisma.product.update({ where: { id: product.id }, data });
+  revalidateTag("products", { expire: 0 });
   return { success: true, id: updated.id, slug: updated.slug, name: updated.name };
 }
 
@@ -176,6 +179,7 @@ async function execGenerateProductImage(args: any) {
     await prisma.product.update({ where: { id: product.id }, data: { image: hostedUrl } });
   }
 
+  revalidateTag("products", { expire: 0 });
   return { success: true, slug: product.slug, name: product.name, imageGenerated: true, imageUrl: hostedUrl };
 }
 
