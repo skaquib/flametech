@@ -216,6 +216,7 @@ model MarketingChatMessage {
   session   MarketingChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   role      String               // "user" | "assistant"
   content   String               @db.Text
+  imageUrl  String?              @db.Text // AI-generated product image attached to this message, if any
   createdAt DateTime             @default(now())
 
   @@index([sessionId])

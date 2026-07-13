@@ -13,6 +13,7 @@ interface Product {
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  imageUrl?: string | null;
 }
 
 interface ChatSessionSummary {
@@ -26,7 +27,8 @@ const SUGGESTIONS = [
   "Who needs a follow-up today?",
   "List all leads overdue by 30+ days",
   "Draft a WhatsApp broadcast for our AMC service",
-  "Write a LinkedIn caption announcing our spare parts catalog",
+  "Create a new spare part called O-Ring Seal Kit, category spare-parts, price 450",
+  "Generate a product image for the FT-05 Gas Burner",
 ];
 
 function timeAgo(iso: string) {
@@ -126,7 +128,7 @@ export default function MarketingClient({ products }: { products: Product[] }) {
       if (!res.ok) {
         setError(data.error || "Could not get a response.");
       } else {
-        setMessages((prev) => [...prev, { role: "assistant", content: data.text }]);
+        setMessages((prev) => [...prev, { role: "assistant", content: data.text, imageUrl: data.imageUrl }]);
         if (!activeSessionId) setActiveSessionId(data.sessionId);
         refreshSessions();
       }
@@ -269,9 +271,9 @@ export default function MarketingClient({ products }: { products: Product[] }) {
                 <Bot className="w-6 h-6 text-brand-orange" />
               </div>
               <div className="space-y-1">
-                <p className="text-slate-900 dark:text-white font-bold text-sm">Ask about leads or draft marketing copy</p>
+                <p className="text-slate-900 dark:text-white font-bold text-sm">Ask about leads, draft marketing copy, or manage the catalog</p>
                 <p className="text-slate-500 text-xs max-w-sm">
-                  Grounded in your real quote-request leads and product catalog — never invents contacts. Drafts are for you to review and send manually.
+                  Grounded in your real leads and product catalog — never invents contacts. Can also create/update products and generate product images directly.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 justify-center pt-2 max-w-lg">
@@ -305,6 +307,13 @@ export default function MarketingClient({ products }: { products: Product[] }) {
                   }`}
                 >
                   {m.content}
+                  {m.imageUrl && (
+                    <img
+                      src={m.imageUrl}
+                      alt="AI-generated product image"
+                      className="mt-2 rounded-lg border border-slate-200 dark:border-slate-800 max-w-full max-h-64 object-contain bg-white"
+                    />
+                  )}
                   {m.role === "assistant" && (
                     <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-800">
                       <button

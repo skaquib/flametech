@@ -31,7 +31,7 @@ export const GET = auth(async function GET(req, ctx) {
   return NextResponse.json({
     id: session.id,
     title: session.title,
-    messages: session.messages.map((m) => ({ role: m.role, content: m.content })),
+    messages: session.messages.map((m) => ({ role: m.role, content: m.content, imageUrl: m.imageUrl })),
   });
 }) as any;
 

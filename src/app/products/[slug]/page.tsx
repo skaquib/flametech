@@ -6,7 +6,9 @@ import prisma from "@/lib/prisma";
 import { Flame, Settings, ArrowLeft, ShieldAlert, FileText, CheckCircle2 } from "lucide-react";
 import ProductDetailClient from "./ProductDetailClient";
 
-export const dynamic = "force-dynamic";
+// Revalidate every 2 minutes instead of rendering fresh on every visit — same
+// catalog data doesn't need a DB round-trip for every single product-page view.
+export const revalidate = 120;
 
 // High fidelity fallback/mock products matching seed data
 const fallbackProducts = [

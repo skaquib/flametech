@@ -30,6 +30,8 @@ export default function CreateProductPage() {
   // browse the rest as a slider on the product detail page.
   const [images, setImages] = useState<string[]>([]);
   const [imageUrlInput, setImageUrlInput] = useState("");
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleAddImageUrl = () => {
     const url = imageUrlInput.trim();
@@ -38,15 +40,25 @@ export default function CreateProductPage() {
     setImageUrlInput("");
   };
 
-  const handleFilesSelected = (fileList: FileList | null) => {
-    if (!fileList) return;
-    Array.from(fileList).forEach((file) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages((prev) => [...prev, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
+  const handleFilesSelected = async (fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return;
+    setUploadingImages(true);
+    setUploadError(null);
+    try {
+      const formData = new FormData();
+      Array.from(fileList).forEach((file) => formData.append("files", file));
+      const res = await fetch("/api/admin/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) {
+        setUploadError(data.error || "Upload failed.");
+      } else {
+        setImages((prev) => [...prev, ...data.urls]);
+      }
+    } catch {
+      setUploadError("Connection error while uploading. Please try again.");
+    } finally {
+      setUploadingImages(false);
+    }
   };
 
   const handleRemoveImage = (idx: number) => {
@@ -313,12 +325,15 @@ export default function CreateProductPage() {
                 type="file"
                 accept="image/*"
                 multiple
+                disabled={uploadingImages}
                 onChange={(e) => {
                   handleFilesSelected(e.target.files);
                   e.target.value = ""; // allow re-selecting the same file(s) again later
                 }}
-                className="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-orange/15 file:text-brand-orange hover:file:bg-brand-orange/20 cursor-pointer"
+                className="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-orange/15 file:text-brand-orange hover:file:bg-brand-orange/20 cursor-pointer disabled:opacity-50 disabled:cursor-wait"
               />
+              {uploadingImages && <p className="text-[10px] text-slate-400 italic">Uploading...</p>}
+              {uploadError && <p className="text-[10px] text-red-500 font-semibold">{uploadError}</p>}
             </div>
           </div>
         </div>

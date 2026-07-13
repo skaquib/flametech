@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import prisma from "@/lib/prisma";
 import AmcPageClient from "./AmcPageClient";
 
-export const dynamic = "force-dynamic";
+// Public marketing page — cache and revalidate every 5 minutes rather than
+// hitting the DB on every visit for a value that barely ever changes.
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Annual Maintenance Contract (AMC) for Industrial Burners",

@@ -5,8 +5,9 @@ import prisma from "@/lib/prisma";
 import { Search, Flame, Settings, ShoppingCart, Info, Wrench, Shield } from "lucide-react";
 import ProductListClient from "./ProductListClient";
 
-// Force dynamic so connection errors don't crash static exports if DB isn't configured yet
-export const dynamic = "force-dynamic";
+// Revalidate every 2 minutes: serves cached HTML instantly to visitors instead of
+// hitting the DB on every request, while still keeping the catalog reasonably fresh.
+export const revalidate = 120;
 
 export const metadata: Metadata = {
   title: "Industrial Burner Catalog — Gas & Oil Burners, Control Panels, Spares",
