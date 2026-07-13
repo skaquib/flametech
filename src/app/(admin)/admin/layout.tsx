@@ -1,10 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { LayoutDashboard, ShoppingBag, ClipboardList, Package, LogOut, Globe, ShieldAlert, Sun, Moon, TrendingUp, Sparkles, Menu, X } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, ClipboardList, Package, LogOut, Globe, ShieldAlert, Sun, Moon, TrendingUp, Sparkles, Menu, X, Loader2 } from "lucide-react";
+
+// Lives inside the Link so useLinkStatus can report whether *this* link's
+// navigation is still pending — greys it out and swaps in a spinner so a
+// click feels immediate even while the next page is still rendering.
+function SidebarLinkContent({ icon, name }: { icon: React.ReactNode; name: string }) {
+  const { pending } = useLinkStatus();
+  return (
+    <div className={`flex items-center space-x-3 transition-opacity ${pending ? "opacity-40" : ""}`}>
+      {pending ? <Loader2 className="w-4 h-4 animate-spin" /> : icon}
+      <span>{name}</span>
+    </div>
+  );
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -126,14 +139,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`flex items-center space-x-3 px-3 py-2.5 rounded-md text-xs font-bold transition-all ${
+                  className={`px-3 py-2.5 rounded-md text-xs font-bold transition-all ${
                     isActive
                       ? "bg-brand-orange/15 text-brand-orange border-l-2 border-brand-orange"
                       : "text-slate-500 dark:text-slate-400 hover:text-slate-900 hover:dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800/20"
                   }`}
                 >
-                  {link.icon}
-                  <span>{link.name}</span>
+                  <SidebarLinkContent icon={link.icon} name={link.name} />
                 </Link>
               );
             })}

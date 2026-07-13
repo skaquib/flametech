@@ -6,7 +6,6 @@ import { getLeadsWithFollowUpStatus } from "@/lib/leads";
 import { uploadImageBuffer } from "@/lib/supabaseStorage";
 
 const GEMINI_TEXT_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-const GEMINI_IMAGE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent";
 const VALID_CATEGORY_SLUGS = ["gas-burners", "oil-burners", "control-panels", "spare-parts"];
 
 function slugify(name: string) {
@@ -120,48 +119,27 @@ async function execGenerateProductImage(args: any) {
   const { product, error } = await findProductByIdentifier(args.identifier);
   if (error || !product) return { success: false, error };
 
-  if (!process.env.GEMINI_API_KEY) {
-    return { success: false, error: "AI assistant is not configured (missing GEMINI_API_KEY)." };
+  // Pollinations.ai is a free, keyless image-generation endpoint — used here instead
+  // of Gemini's image model, which requires paid billing on the Google AI project.
+  const prompt = `Professional product photo, clean white studio background, industrial equipment photography style: ${args.prompt}`;
+  const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&nologo=true`;
+
+  let imageRes: Response;
+  try {
+    imageRes = await fetch(pollinationsUrl, { signal: AbortSignal.timeout(45_000) });
+  } catch (fetchErr: any) {
+    console.error("Pollinations image generation request failed:", fetchErr);
+    return { success: false, error: "Image generation timed out. Please try again." };
   }
 
-  const imageRes = await fetch(`${GEMINI_IMAGE_URL}?key=${process.env.GEMINI_API_KEY}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [
-        {
-          parts: [
-            {
-              text: `Professional product photo, clean white studio background, industrial equipment photography style: ${args.prompt}`,
-            },
-          ],
-        },
-      ],
-    }),
-  });
-
   if (!imageRes.ok) {
-    const errText = await imageRes.text();
-    console.error("Gemini image generation error:", errText);
-    if (imageRes.status === 429) {
-      return {
-        success: false,
-        error: "AI image generation isn't available yet — this Google AI project has no billing/quota enabled for image models. Enable billing on the Google AI Studio project to use this.",
-      };
-    }
+    console.error("Pollinations image generation error:", imageRes.status, await imageRes.text().catch(() => ""));
     return { success: false, error: "Image generation failed. Please try again." };
   }
 
-  const imageData = await imageRes.json();
-  const parts = imageData?.candidates?.[0]?.content?.parts || [];
-  const imagePart = parts.find((p: any) => p.inlineData);
-  if (!imagePart) {
-    return { success: false, error: "The AI didn't return an image for that prompt. Try rephrasing it." };
-  }
-
-  const mimeType = imagePart.inlineData.mimeType || "image/png";
-  const extension = mimeType.split("/")[1] || "png";
-  const buffer = Buffer.from(imagePart.inlineData.data, "base64");
+  const mimeType = imageRes.headers.get("content-type") || "image/jpeg";
+  const extension = mimeType.split("/")[1]?.split(";")[0] || "jpg";
+  const buffer = Buffer.from(await imageRes.arrayBuffer());
 
   let hostedUrl: string;
   try {
@@ -346,6 +324,13 @@ Rules:
       if (!geminiRes.ok) {
         const errText = await geminiRes.text();
         console.error("Gemini API error:", errText);
+        if (geminiRes.status === 429) {
+          const isBilling = /prepayment|billing|credits/i.test(errText);
+          const message = isBilling
+            ? "The AI is unavailable — your Google AI Studio project's prepaid credits are depleted. Add billing/credits at ai.studio/projects to restore it."
+            : "The AI hit a rate limit — please wait a moment and try again.";
+          return NextResponse.json({ error: message, sessionId }, { status: 502 });
+        }
         return NextResponse.json({ error: "AI generation failed. Please try again.", sessionId }, { status: 502 });
       }
 
