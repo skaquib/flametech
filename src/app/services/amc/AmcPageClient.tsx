@@ -236,7 +236,8 @@ export default function AmcPageClient({ amcProductId }: { amcProductId: string |
                 <div className="pt-4 space-y-3">
                   <button
                     onClick={handleAddToCart}
-                    className={`w-full py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center space-x-2 shadow-lg ${
+                    disabled={added}
+                    className={`w-full py-3 rounded-lg text-sm font-bold transition-all flex items-center justify-center space-x-2 shadow-lg disabled:cursor-default ${
                       added
                         ? "bg-brand-teal text-white shadow-brand-teal/10"
                         : "bg-brand-orange hover:bg-brand-orange/95 text-white shadow-brand-orange/15"

@@ -194,7 +194,7 @@ export default function CheckoutPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Contact name */}
-                <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                <div className="space-y-1.5">
                   <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Full Name *</label>
                   <input
                     type="text"
@@ -206,7 +206,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 {/* Contact phone */}
-                <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                <div className="space-y-1.5">
                   <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Contact Phone *</label>
                   <input
                     type="tel"
@@ -218,7 +218,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 {/* Contact email */}
-                <div className="space-y-1.5 col-span-2">
+                <div className="space-y-1.5 sm:col-span-2">
                   <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Email Address *</label>
                   <input
                     type="email"
@@ -253,7 +253,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Line 1 */}
-                <div className="space-y-1.5 col-span-2">
+                <div className="space-y-1.5 sm:col-span-2">
                   <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Address Line 1 *</label>
                   <input
                     type="text"
@@ -265,7 +265,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 {/* Line 2 */}
-                <div className="space-y-1.5 col-span-2">
+                <div className="space-y-1.5 sm:col-span-2">
                   <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Address Line 2 (Optional)</label>
                   <input
                     type="text"

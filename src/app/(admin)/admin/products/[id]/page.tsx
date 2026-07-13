@@ -28,11 +28,37 @@ export default function EditProductPage() {
     taxRate: "18%",
     stockQty: "0",
     unit: "SET",
-    image: "",
   });
 
   // Dynamic specs fields
   const [specs, setSpecs] = useState<{ label: string; value: string }[]>([]);
+
+  // Product gallery — first image is the cover shown in listings; customers can
+  // browse the rest as a slider on the product detail page.
+  const [images, setImages] = useState<string[]>([]);
+  const [imageUrlInput, setImageUrlInput] = useState("");
+
+  const handleAddImageUrl = () => {
+    const url = imageUrlInput.trim();
+    if (!url) return;
+    setImages((prev) => [...prev, url]);
+    setImageUrlInput("");
+  };
+
+  const handleFilesSelected = (fileList: FileList | null) => {
+    if (!fileList) return;
+    Array.from(fileList).forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImages((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemoveImage = (idx: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   // Fetch product on mount
   useEffect(() => {
@@ -55,8 +81,13 @@ export default function EditProductPage() {
           taxRate: data.taxRate || "18%",
           stockQty: data.stockQty !== null && data.stockQty !== undefined ? String(data.stockQty) : "0",
           unit: data.unit || "SET",
-          image: data.image || "",
         });
+
+        if (data.images && Array.isArray(data.images) && data.images.length > 0) {
+          setImages(data.images.map((img: any) => img.url));
+        } else if (data.image) {
+          setImages([data.image]);
+        }
 
         if (data.specs && Array.isArray(data.specs)) {
           setSpecs(data.specs.map((s: any) => ({ label: s.label, value: s.value })));
@@ -99,6 +130,7 @@ export default function EditProductPage() {
           price: form.type === "EQUIPMENT" ? null : parseInt(form.price) || 0,
           stockQty: parseInt(form.stockQty) || 0,
           specs,
+          images,
         }),
       });
 
@@ -183,7 +215,7 @@ export default function EditProductPage() {
           <h3 className="text-slate-900 dark:text-white font-bold text-sm border-b border-slate-200 dark:border-brand-slate/30 pb-2">Core Product Details</h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5 col-span-2">
+            <div className="space-y-1.5 sm:col-span-2">
               <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Product Name *</label>
               <input
                 type="text"
@@ -287,57 +319,85 @@ export default function EditProductPage() {
           </div>
         )}
 
-        {/* Product Image Showcase & Upload */}
+        {/* Product Image Gallery & Upload */}
         <div className="bg-white dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/40 p-6 rounded-xl space-y-4">
-          <h3 className="text-slate-900 dark:text-white font-bold text-sm border-b border-slate-200 dark:border-brand-slate/30 pb-2">Product Image</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            {/* Image Preview Container */}
-            <div className="space-y-1.5">
-              <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center">
-                <img
-                  src={form.image || DEFAULT_PRODUCT_IMAGE}
-                  alt="Product preview"
-                  className="w-full h-full object-contain p-2"
-                />
-              </div>
-              {!form.image && (
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 italic">
-                  No image uploaded yet — customers see this default placeholder.
-                </p>
-              )}
-            </div>
+          <h3 className="text-slate-900 dark:text-white font-bold text-sm border-b border-slate-200 dark:border-brand-slate/30 pb-2">Product Images</h3>
 
-            {/* URL/Upload input fields */}
-            <div className="col-span-2 space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Image Path / URL</label>
+          {/* Thumbnail grid — first image is the cover shown in listings; customers browse the rest as a slider */}
+          {images.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {images.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="relative group aspect-square rounded-lg overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30"
+                >
+                  <img src={img} alt={`Product image ${idx + 1}`} className="w-full h-full object-contain p-2" />
+                  {idx === 0 && (
+                    <span className="absolute top-1.5 left-1.5 bg-brand-orange text-white text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded">
+                      Cover
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(idx)}
+                    title="Remove image"
+                    className="absolute top-1.5 right-1.5 p-1.5 bg-red-600 hover:bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="aspect-[4/3] w-full max-w-xs rounded-lg overflow-hidden bg-slate-100 dark:bg-brand-navy border border-slate-200 dark:border-brand-slate/30 flex items-center justify-center">
+              <img src={DEFAULT_PRODUCT_IMAGE} alt="Default placeholder" className="w-full h-full object-contain p-2" />
+            </div>
+          )}
+          {images.length === 0 && (
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 italic">
+              No images uploaded yet — customers see this default placeholder. Add at least one below.
+            </p>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Add Image by Path / URL</label>
+              <div className="flex gap-2">
                 <input
                   type="text"
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  placeholder="e.g., /images/ft-05.jpg"
-                  className="w-full bg-slate-50 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Upload New Image File</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        setForm({ ...form, image: reader.result as string });
-                      };
-                      reader.readAsDataURL(file);
+                  value={imageUrlInput}
+                  onChange={(e) => setImageUrlInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddImageUrl();
                     }
                   }}
-                  className="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-orange/15 file:text-brand-orange hover:file:bg-brand-orange/20 cursor-pointer"
+                  placeholder="e.g., /images/ft-05.jpg"
+                  className="flex-1 bg-slate-50 dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none"
                 />
+                <button
+                  type="button"
+                  onClick={handleAddImageUrl}
+                  className="px-4 bg-brand-teal/10 hover:bg-brand-teal/20 border border-brand-teal/30 text-brand-teal text-xs font-bold uppercase rounded-md"
+                >
+                  Add
+                </button>
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Upload Image File(s)</label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(e) => {
+                  handleFilesSelected(e.target.files);
+                  e.target.value = ""; // allow re-selecting the same file(s) again later
+                }}
+                className="w-full text-xs text-slate-600 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-brand-orange/15 file:text-brand-orange hover:file:bg-brand-orange/20 cursor-pointer"
+              />
             </div>
           </div>
         </div>
@@ -392,7 +452,7 @@ export default function EditProductPage() {
                   placeholder="Parameter Label (e.g. Thermal Power)"
                   value={s.label}
                   onChange={(e) => handleSpecChange(idx, "label", e.target.value)}
-                  className="flex-1 bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
+                  className="flex-1 min-w-0 bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
                 />
                 <input
                   type="text"
@@ -400,7 +460,7 @@ export default function EditProductPage() {
                   placeholder="Value (e.g. 50 - 150 KW)"
                   value={s.value}
                   onChange={(e) => handleSpecChange(idx, "value", e.target.value)}
-                  className="flex-1 bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
+                  className="flex-1 min-w-0 bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:border-brand-orange"
                 />
                 <button
                   type="button"

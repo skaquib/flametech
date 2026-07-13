@@ -148,7 +148,7 @@ ${form.message}`;
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Name */}
-                  <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                  <div className="space-y-1.5">
                     <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Your Name *</label>
                     <input
                       type="text"
@@ -160,7 +160,7 @@ ${form.message}`;
                     />
                   </div>
                   {/* Phone */}
-                  <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                  <div className="space-y-1.5">
                     <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Mobile Number *</label>
                     <input
                       type="tel"
@@ -172,7 +172,7 @@ ${form.message}`;
                     />
                   </div>
                   {/* Company */}
-                  <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                  <div className="space-y-1.5">
                     <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Company Name</label>
                     <input
                       type="text"
@@ -183,7 +183,7 @@ ${form.message}`;
                     />
                   </div>
                   {/* Email */}
-                  <div className="space-y-1.5 col-span-2 sm:col-span-1">
+                  <div className="space-y-1.5">
                     <label className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Email Address</label>
                     <input
                       type="email"

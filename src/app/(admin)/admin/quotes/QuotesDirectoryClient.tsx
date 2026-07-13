@@ -28,8 +28,10 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
   const [page, setPage] = useState(1);
   const [errorId, setErrorId] = useState<string | null>(null);
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({});
+  const [savingIds, setSavingIds] = useState<Set<string>>(new Set());
 
   const patchQuote = async (id: string, data: Record<string, unknown>, revert: () => void) => {
+    setSavingIds((prev) => new Set(prev).add(id));
     try {
       const res = await fetch(`/api/quotes/${id}`, {
         method: "PATCH",
@@ -45,16 +47,24 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
       revert();
       setErrorId(id);
       setTimeout(() => setErrorId((cur) => (cur === id ? null : cur)), 4000);
+    } finally {
+      setSavingIds((cur) => {
+        const next = new Set(cur);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
   const handleUpdateStatus = (id: string, newStatus: Quote["status"]) => {
+    if (savingIds.has(id)) return;
     const prev = list;
     setList(list.map((q) => (q.id === id ? { ...q, status: newStatus } : q)));
     patchQuote(id, { status: newStatus }, () => setList(prev));
   };
 
   const handleMarkContacted = (id: string) => {
+    if (savingIds.has(id)) return;
     const prev = list;
     const now = new Date().toISOString();
     setList(list.map((q) => (q.id === id ? { ...q, lastContactedAt: now } : q)));
@@ -220,7 +230,8 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
                       <select
                         value={q.status}
                         onChange={(e) => handleUpdateStatus(q.id, e.target.value as any)}
-                        className="bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded text-[10px] py-1 px-2 text-slate-700 dark:text-slate-300 font-bold focus:outline-none"
+                        disabled={savingIds.has(q.id)}
+                        className="bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded text-[10px] py-1 px-2 text-slate-700 dark:text-slate-300 font-bold focus:outline-none disabled:opacity-50 disabled:cursor-wait"
                       >
                         <option value="NEW">Mark New</option>
                         <option value="CONTACTED">Mark Contacted</option>
@@ -230,9 +241,10 @@ export default function QuotesDirectoryClient({ quotes }: { quotes: Quote[] }) {
                       </select>
                       <button
                         onClick={() => handleMarkContacted(q.id)}
-                        className="text-[9px] font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-wide"
+                        disabled={savingIds.has(q.id)}
+                        className="text-[9px] font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-wide disabled:opacity-50 disabled:cursor-wait disabled:hover:text-emerald-500"
                       >
-                        Log contact today
+                        {savingIds.has(q.id) ? "Saving..." : "Log contact today"}
                       </button>
                     </div>
                   </td>

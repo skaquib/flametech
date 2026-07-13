@@ -25,8 +25,12 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [page, setPage] = useState(1);
+  const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
+    if (togglingIds.has(id)) return; // already in flight — ignore extra clicks
+    setTogglingIds((prev) => new Set(prev).add(id));
+
     // Optimistic UI update
     const prev = list;
     const updatedList = list.map((p) => (p.id === id ? { ...p, isActive: !currentStatus } : p));
@@ -44,6 +48,12 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
       }
     } catch (err) {
       setList(prev);
+    } finally {
+      setTogglingIds((cur) => {
+        const next = new Set(cur);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
@@ -174,14 +184,21 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
                     <td className="px-6 py-4">
                       <button
                         onClick={() => handleToggleActive(p.id, p.isActive)}
-                        className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-colors ${
+                        disabled={togglingIds.has(p.id)}
+                        className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-[10px] font-bold border transition-colors disabled:opacity-50 disabled:cursor-wait ${
                           p.isActive
                             ? "bg-emerald-950/20 border-emerald-900/60 text-emerald-400 hover:bg-emerald-950/40"
                             : "bg-red-950/20 border-red-900/60 text-red-400 hover:bg-red-950/40"
                         }`}
                       >
-                        {p.isActive ? <CircleCheck className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
-                        <span>{p.isActive ? "ACTIVE" : "INACTIVE"}</span>
+                        {togglingIds.has(p.id) ? (
+                          <Circle className="w-3.5 h-3.5 animate-spin" />
+                        ) : p.isActive ? (
+                          <CircleCheck className="w-3.5 h-3.5" />
+                        ) : (
+                          <Circle className="w-3.5 h-3.5" />
+                        )}
+                        <span>{togglingIds.has(p.id) ? "Saving..." : p.isActive ? "ACTIVE" : "INACTIVE"}</span>
                       </button>
                     </td>
 

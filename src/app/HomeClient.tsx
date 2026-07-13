@@ -990,12 +990,12 @@ export default function HomeClient() {
                 className="group flex flex-col bg-slate-50 dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/30 rounded-2xl overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 shadow-sm"
               >
                 {/* Image */}
-                <div className="relative overflow-hidden h-52 bg-white dark:bg-[#060b13]/40 flex items-center justify-center">
+                <div className="relative overflow-hidden h-52 bg-slate-100 dark:bg-brand-navy">
                   <img
                     src={product.image}
                     alt={product.name}
                     onError={(e) => { e.currentTarget.src = "/images/hero-burner.png"; }}
-                    className="h-44 w-auto object-contain group-hover:scale-105 transition-transform duration-500 filter drop-shadow-md"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute top-3 left-3">
                     <span className={`${product.badgeColor} text-white text-[9px] font-extrabold tracking-wider px-2.5 py-1 rounded uppercase`}>

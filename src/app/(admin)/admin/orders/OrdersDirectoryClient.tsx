@@ -18,8 +18,12 @@ interface Order {
 export default function OrdersDirectoryClient({ orders }: { orders: Order[] }) {
   const [list, setList] = useState<Order[]>(orders);
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set());
 
   const handleUpdateStatus = async (id: string, newStatus: Order["status"]) => {
+    if (updatingIds.has(id)) return; // an update for this order is already in flight
+    setUpdatingIds((prev) => new Set(prev).add(id));
+
     // Optimistic UI update
     const updated = list.map((o) => (o.id === id ? { ...o, status: newStatus } : o));
     setList(updated);
@@ -36,6 +40,12 @@ export default function OrdersDirectoryClient({ orders }: { orders: Order[] }) {
       }
     } catch (err) {
       console.warn("API status patch error, keeping optimistic status");
+    } finally {
+      setUpdatingIds((cur) => {
+        const next = new Set(cur);
+        next.delete(id);
+        return next;
+      });
     }
   };
 
@@ -138,7 +148,8 @@ export default function OrdersDirectoryClient({ orders }: { orders: Order[] }) {
                     <select
                       value={o.status}
                       onChange={(e) => handleUpdateStatus(o.id, e.target.value as any)}
-                      className="bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded text-[10px] py-1 px-2 text-slate-700 dark:text-slate-300 font-bold focus:outline-none"
+                      disabled={updatingIds.has(o.id)}
+                      className="bg-white dark:bg-[#060b13] border border-slate-300 dark:border-slate-700 rounded text-[10px] py-1 px-2 text-slate-700 dark:text-slate-300 font-bold focus:outline-none disabled:opacity-50 disabled:cursor-wait"
                     >
                       <option value="PENDING">Pending Verify</option>
                       <option value="PAID">Mark Paid</option>

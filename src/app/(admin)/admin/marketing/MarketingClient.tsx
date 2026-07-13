@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Sparkles, Copy, Check, AlertTriangle, Send, Bot, User, Plus, Trash2, MessageSquare, PanelLeftOpen, PanelLeftClose } from "lucide-react";
+import { Sparkles, Copy, Check, AlertTriangle, Send, Bot, User, Plus, Trash2, MessageSquare, PanelLeftOpen, PanelLeftClose, X } from "lucide-react";
 
 interface Product {
   id: string;
@@ -49,14 +49,8 @@ export default function MarketingClient({ products }: { products: Product[] }) {
   const [loadingSession, setLoadingSession] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [sessionsOpen, setSessionsOpen] = useState(true);
+  const [sessionsOpen, setSessionsOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Default the session history panel to collapsed on narrow screens so the
-  // chat itself isn't squeezed into a sliver next to a 256px-wide list.
-  useEffect(() => {
-    if (window.innerWidth < 768) setSessionsOpen(false);
-  }, []);
 
   const refreshSessions = async () => {
     try {
@@ -77,12 +71,14 @@ export default function MarketingClient({ products }: { products: Product[] }) {
   }, [messages, loading]);
 
   const handleNewChat = () => {
+    if (loading) return; // don't switch away while a response is still in flight
     setActiveSessionId(null);
     setMessages([]);
     setError(null);
   };
 
   const handleSelectSession = async (id: string) => {
+    if (loading || loadingSession) return; // avoid a response landing in the wrong session
     if (id === activeSessionId) return;
     setLoadingSession(true);
     setError(null);
@@ -104,6 +100,7 @@ export default function MarketingClient({ products }: { products: Product[] }) {
 
   const handleDeleteSession = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
+    if (loading && id === activeSessionId) return; // don't clear the panel mid-response
     setSessions((prev) => prev.filter((s) => s.id !== id));
     if (id === activeSessionId) handleNewChat();
     await fetch(`/api/admin/marketing/sessions/${id}`, { method: "DELETE" }).catch(() => {});
@@ -165,17 +162,41 @@ export default function MarketingClient({ products }: { products: Product[] }) {
       : SUGGESTIONS;
 
   return (
-    <div className="flex gap-4 h-[70vh] max-h-[720px] min-w-0">
-      {/* Session sidebar */}
+    <div className="relative flex gap-4 h-[70vh] max-h-[720px] min-w-0">
+      {/* Mobile-only backdrop, shown while the drawer is open below `lg` */}
+      {sessionsOpen && (
+        <div
+          onClick={() => setSessionsOpen(false)}
+          className="absolute inset-0 bg-black/50 z-20 lg:hidden"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Session sidebar — off-canvas drawer below `lg`, static collapsible panel at `lg`+ */}
       <div
-        className={`shrink-0 bg-white dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/40 rounded-xl flex flex-col overflow-hidden transition-all duration-300 ${
-          sessionsOpen ? "w-64 opacity-100" : "w-0 border-0 opacity-0 pointer-events-none"
+        className={`shrink-0 w-64 bg-white dark:bg-[#0a1128]/50 border border-slate-200 dark:border-brand-slate/40 rounded-xl flex flex-col overflow-hidden absolute inset-y-0 left-0 z-30 transition-all duration-300 ease-in-out lg:static lg:z-auto lg:translate-x-0 ${
+          sessionsOpen
+            ? "translate-x-0 lg:w-64 lg:opacity-100"
+            : "-translate-x-full lg:w-0 lg:border-0 lg:opacity-0 lg:pointer-events-none"
         }`}
       >
-        <div className="p-3 border-b border-slate-200 dark:border-brand-slate/40">
+        <div className="p-3 border-b border-slate-200 dark:border-brand-slate/40 space-y-2">
+          <div className="flex items-center justify-between lg:hidden">
+            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Chat History</span>
+            <button
+              onClick={() => setSessionsOpen(false)}
+              type="button"
+              className="p-1.5 rounded-md text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              aria-label="Close chat history"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
           <button
             onClick={handleNewChat}
-            className="w-full flex items-center justify-center gap-1.5 py-2 bg-brand-orange/10 hover:bg-brand-orange/20 border border-brand-orange/30 text-brand-orange text-xs font-bold rounded-lg transition-colors"
+            disabled={loading}
+            title={loading ? "Wait for the current response to finish" : undefined}
+            className="w-full flex items-center justify-center gap-1.5 py-2 bg-brand-orange/10 hover:bg-brand-orange/20 border border-brand-orange/30 text-brand-orange text-xs font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-wait"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Chat</span>
@@ -189,12 +210,15 @@ export default function MarketingClient({ products }: { products: Product[] }) {
             <div
               key={s.id}
               role="button"
-              tabIndex={0}
+              aria-disabled={loading || loadingSession}
+              tabIndex={loading || loadingSession ? -1 : 0}
               onClick={() => handleSelectSession(s.id)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") handleSelectSession(s.id);
               }}
-              className={`w-full text-left px-2.5 py-2 rounded-lg group flex items-start gap-2 transition-colors cursor-pointer ${
+              className={`w-full text-left px-2.5 py-2 rounded-lg group flex items-start gap-2 transition-colors ${
+                loading || loadingSession ? "opacity-50 cursor-wait pointer-events-none" : "cursor-pointer"
+              } ${
                 s.id === activeSessionId
                   ? "bg-brand-orange/10 border border-brand-orange/30"
                   : "hover:bg-slate-100 dark:hover:bg-slate-800/40 border border-transparent"
@@ -209,6 +233,7 @@ export default function MarketingClient({ products }: { products: Product[] }) {
               </div>
               <button
                 onClick={(e) => handleDeleteSession(s.id, e)}
+                disabled={loading || loadingSession}
                 className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 transition-opacity shrink-0"
                 title="Delete chat"
               >
@@ -233,7 +258,7 @@ export default function MarketingClient({ products }: { products: Product[] }) {
           </button>
           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Chat History</span>
         </div>
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
           {loadingSession && (
             <div className="h-full flex items-center justify-center text-slate-400 text-xs italic">Loading chat...</div>
           )}
@@ -254,7 +279,8 @@ export default function MarketingClient({ products }: { products: Product[] }) {
                   <button
                     key={s}
                     onClick={() => sendMessage(s)}
-                    className="px-3 py-1.5 bg-slate-100 dark:bg-brand-dark/40 border border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-semibold rounded-full hover:border-brand-orange/50 hover:text-brand-orange transition-colors"
+                    disabled={loading}
+                    className="px-3 py-1.5 bg-slate-100 dark:bg-brand-dark/40 border border-slate-300 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-[11px] font-semibold rounded-full hover:border-brand-orange/50 hover:text-brand-orange transition-colors disabled:opacity-50 disabled:cursor-wait disabled:hover:border-slate-300 dark:disabled:hover:border-slate-800 disabled:hover:text-slate-600 dark:disabled:hover:text-slate-300"
                   >
                     {s}
                   </button>

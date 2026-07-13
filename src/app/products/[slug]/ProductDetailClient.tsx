@@ -67,6 +67,18 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   };
 
+  // Online checkout isn't live yet — this gives every product a direct way to
+  // place an order/inquiry manually via WhatsApp in the meantime.
+  const getOrderInquiryLink = () => {
+    const phone = "919869588728";
+    const unitPrice = product.price || 0;
+    const estTotal = unitPrice * quantity;
+    const text = product.price
+      ? `Hello FlameTech Engineering! I'd like to order this part:\n\n*Product:* ${product.name}\n*Item Code:* ${product.itemCode || "N/A"}\n*Quantity:* ${quantity}\n*Unit Price:* ₹${unitPrice.toLocaleString()}\n*Est. Total:* ₹${estTotal.toLocaleString()} + GST\n\nPlease confirm availability and help me complete this order.`
+      : `Hello FlameTech Engineering! I'd like to enquire about *${product.name}* (Code: *${product.itemCode || "N/A"}*). Please share pricing and availability.`;
+    return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+  };
+
   // Gallery: use real ProductImage records if present, else fall back to the single legacy image field
   const gallery: ProductImageItem[] =
     product.images && product.images.length > 0
@@ -319,11 +331,24 @@ ${quoteForm.message || "N/A"}`;
               </div>
             ) : (
               <form onSubmit={handleQuoteSubmit} className="space-y-4 text-left">
-                <div className="border-b border-slate-200 dark:border-brand-slate/40 pb-4">
-                  <h2 className="text-slate-900 dark:text-white font-black text-xl">B2B Quote Request</h2>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">
-                    Fill in your project requirements for direct plant pricing.
-                  </p>
+                <div className="border-b border-slate-200 dark:border-brand-slate/40 pb-4 space-y-3">
+                  <div>
+                    <h2 className="text-slate-900 dark:text-white font-black text-xl">B2B Quote Request</h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs mt-1">
+                      Fill in your project requirements for direct plant pricing.
+                    </p>
+                  </div>
+                  <a
+                    href={getOrderInquiryLink()}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center space-x-2 w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold transition-all"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.863-9.864.001-2.63-1.019-5.101-2.875-6.958C16.604 1.926 14.129.905 11.5.905c-5.439 0-9.863 4.42-9.866 9.863-.002 1.93.501 3.81 1.458 5.484L2.08 21.8l5.567-1.458-.001-.001v.001zM17.828 14.7c-.312-.156-1.848-.912-2.128-1.013-.28-.102-.485-.153-.687.153-.202.304-.783.912-.96 1.114-.177.203-.354.228-.666.072-1.344-.672-2.203-1.172-3.08-2.697-.231-.4-.231-.77-.072-.929.143-.143.312-.365.468-.547.156-.183.208-.314.312-.523.104-.209.052-.392-.026-.547-.078-.156-.687-1.657-.942-2.269-.25-.599-.5-.517-.687-.527-.178-.009-.382-.01-.587-.01s-.538.076-.82.382c-.282.307-1.077 1.054-1.077 2.571s1.103 2.983 1.258 3.189c.155.206 2.17 3.313 5.258 4.646.734.317 1.308.507 1.753.649.738.234 1.41.201 1.941.122.593-.088 1.848-.756 2.108-1.488.26-.731.26-1.36.183-1.488-.077-.128-.282-.204-.594-.36z" />
+                    </svg>
+                    <span>Or Inquire Directly on WhatsApp</span>
+                  </a>
                 </div>
 
                 {quoteError && (
@@ -466,7 +491,8 @@ ${quoteForm.message || "N/A"}`;
             <div className="space-y-3 pt-4">
               <button
                 onClick={handleAddToCart}
-                className={`w-full py-3.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center space-x-2 shadow-lg ${
+                disabled={added}
+                className={`w-full py-3.5 rounded-lg text-sm font-bold transition-all flex items-center justify-center space-x-2 shadow-lg disabled:cursor-default ${
                   added
                     ? "bg-brand-teal text-white shadow-brand-teal/15"
                     : "bg-brand-orange hover:bg-brand-orange/95 text-white shadow-brand-orange/15"
@@ -475,6 +501,18 @@ ${quoteForm.message || "N/A"}`;
                 {added ? <Check className="w-4 h-4" /> : <ShoppingCart className="w-4 h-4" />}
                 <span>{added ? "Added to Cart!" : "Add Spare to Cart"}</span>
               </button>
+
+              <a
+                href={getOrderInquiryLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center space-x-2 w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-bold transition-all shadow-lg shadow-emerald-600/15"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.42 9.863-9.864.001-2.63-1.019-5.101-2.875-6.958C16.604 1.926 14.129.905 11.5.905c-5.439 0-9.863 4.42-9.866 9.863-.002 1.93.501 3.81 1.458 5.484L2.08 21.8l5.567-1.458-.001-.001v.001zM17.828 14.7c-.312-.156-1.848-.912-2.128-1.013-.28-.102-.485-.153-.687.153-.202.304-.783.912-.96 1.114-.177.203-.354.228-.666.072-1.344-.672-2.203-1.172-3.08-2.697-.231-.4-.231-.77-.072-.929.143-.143.312-.365.468-.547.156-.183.208-.314.312-.523.104-.209.052-.392-.026-.547-.078-.156-.687-1.657-.942-2.269-.25-.599-.5-.517-.687-.527-.178-.009-.382-.01-.587-.01s-.538.076-.82.382c-.282.307-1.077 1.054-1.077 2.571s1.103 2.983 1.258 3.189c.155.206 2.17 3.313 5.258 4.646.734.317 1.308.507 1.753.649.738.234 1.41.201 1.941.122.593-.088 1.848-.756 2.108-1.488.26-.731.26-1.36.183-1.488-.077-.128-.282-.204-.594-.36z" />
+                </svg>
+                <span>Order via WhatsApp Instead</span>
+              </a>
 
               <Link
                 href="/cart"

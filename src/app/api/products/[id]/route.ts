@@ -12,7 +12,7 @@ export async function GET(req: NextRequest, context: any) {
   try {
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { specs: true, category: true },
+      include: { specs: true, category: true, images: { orderBy: { position: "asc" } } },
     });
     if (!product) {
       return NextResponse.json({ error: "Product not found." }, { status: 404 });
@@ -35,7 +35,7 @@ export const PATCH = auth(async function PATCH(req, context: any) {
 
   try {
     const body = await req.json();
-    const { name, slug, itemCode, type, categoryId, shortDesc, description, price, hsn, taxRate, stockQty, unit, specs, isActive, image } = body;
+    const { name, slug, itemCode, type, categoryId, shortDesc, description, price, hsn, taxRate, stockQty, unit, specs, isActive, image, images } = body;
 
     const updateData: any = {};
     if (isActive !== undefined) updateData.isActive = isActive;
@@ -50,7 +50,19 @@ export const PATCH = auth(async function PATCH(req, context: any) {
     if (taxRate !== undefined) updateData.taxRate = taxRate;
     if (stockQty !== undefined) updateData.stockQty = stockQty;
     if (unit !== undefined) updateData.unit = unit;
-    if (image !== undefined) updateData.image = image;
+
+    // `images` (gallery) is the source of truth when provided; the legacy single
+    // `image` field is kept in sync to the cover (first) image for older callers.
+    if (images !== undefined) {
+      const galleryUrls: string[] = Array.isArray(images) ? images.filter(Boolean) : [];
+      updateData.image = galleryUrls[0] ?? null;
+      updateData.images = {
+        deleteMany: {},
+        create: galleryUrls.map((url: string, position: number) => ({ url, position })),
+      };
+    } else if (image !== undefined) {
+      updateData.image = image;
+    }
 
     if (categoryId !== undefined) {
       const category = await prisma.category.findUnique({
