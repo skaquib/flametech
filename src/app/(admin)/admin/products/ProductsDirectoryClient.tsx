@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
-import { Search, Flame, Settings, Edit3, Circle, CircleCheck, AlertTriangle, Trash2, RotateCcw, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, Flame, Settings, Edit3, Circle, CircleCheck, AlertTriangle, Trash2, RotateCcw, ChevronDown, ChevronUp, Loader2, FileSpreadsheet, X } from "lucide-react";
 import { DEFAULT_PRODUCT_IMAGE } from "@/lib/constants";
 
 interface Product {
@@ -34,7 +35,16 @@ function daysRemaining(deletedAt: string | Date) {
   return Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
 }
 
+interface ImportResult {
+  totalRows: number;
+  created: number;
+  updated: number;
+  skipped: number;
+  skippedSample: string[];
+}
+
 export default function ProductsDirectoryClient({ products, trashedProducts = [] }: { products: Product[]; trashedProducts?: TrashedProduct[] }) {
+  const router = useRouter();
   const [list, setList] = useState<Product[]>(products);
   const [trashList, setTrashList] = useState<TrashedProduct[]>(trashedProducts);
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,6 +58,11 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
   const [showTrash, setShowTrash] = useState(false);
   const [selectedTrashIds, setSelectedTrashIds] = useState<Set<string>>(new Set());
   const [restoring, setRestoring] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     if (togglingIds.has(id)) return; // already in flight — ignore extra clicks
@@ -188,7 +203,7 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
         });
         // Full product record isn't available client-side after restore, so
         // refresh the page data to bring it back into the active directory list.
-        window.location.reload();
+        router.refresh();
       } else {
         alert("Could not restore the selected products. Please try again.");
       }
@@ -196,6 +211,39 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
       alert("Network connection error.");
     } finally {
       setRestoring(false);
+    }
+  };
+
+  const handleFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file next time
+    if (!file || importing) return;
+
+    setImporting(true);
+    setImportError(null);
+    setImportResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/products/import-excel", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setImportResult(data);
+        router.refresh();
+      } else {
+        setImportError(data.error || "Could not import this file.");
+      }
+    } catch {
+      setImportError("Network connection error.");
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -273,6 +321,49 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
           </div>
         )}
       </div>
+
+      {/* Excel import */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".xls,.xlsx"
+        onChange={handleFileSelected}
+        className="hidden"
+      />
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={importing}
+          className="flex items-center space-x-2 px-4 py-2.5 bg-brand-teal/10 hover:bg-brand-teal/20 border border-brand-teal/40 text-brand-teal font-bold rounded-lg text-xs transition-all disabled:opacity-50"
+        >
+          {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
+          <span>{importing ? "Importing..." : "Upload Excel (Vyapar export)"}</span>
+        </button>
+      </div>
+
+      {importError && (
+        <div className="flex items-start justify-between px-4 py-3 bg-red-950/20 border border-red-900/60 text-red-400 rounded-lg text-xs">
+          <span>{importError}</span>
+          <button onClick={() => setImportError(null)}><X className="w-3.5 h-3.5" /></button>
+        </div>
+      )}
+
+      {importResult && (
+        <div className="flex items-start justify-between px-4 py-3 bg-emerald-950/20 border border-emerald-900/60 text-emerald-400 rounded-lg text-xs">
+          <div>
+            <p className="font-bold">
+              Import complete — {importResult.created} added, {importResult.updated} updated, {importResult.skipped} skipped (of {importResult.totalRows} rows).
+            </p>
+            {importResult.skippedSample.length > 0 && (
+              <p className="mt-1 text-emerald-400/70">
+                Skipped (no price, treated as internal stock): {importResult.skippedSample.join(", ")}
+                {importResult.skipped > importResult.skippedSample.length ? "…" : ""}
+              </p>
+            )}
+          </div>
+          <button onClick={() => setImportResult(null)}><X className="w-3.5 h-3.5 shrink-0 ml-3" /></button>
+        </div>
+      )}
 
       {/* Filtering Bar */}
       <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
