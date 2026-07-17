@@ -90,7 +90,10 @@ export const POST = auth(async function POST(req) {
     let created = 0;
     let updated = 0;
     let skipped = 0;
+    const createdSample: string[] = [];
+    const updatedSample: string[] = [];
     const skippedSample: string[] = [];
+    const SAMPLE_LIMIT = 50;
 
     for (const row of rows) {
       const name = String(row["Item Name"] ?? "").trim();
@@ -98,6 +101,7 @@ export const POST = auth(async function POST(req) {
       const isJunkRow = !name || /^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(name);
       if (isJunkRow) {
         skipped++;
+        if (name && skippedSample.length < SAMPLE_LIMIT) skippedSample.push(`${name} (not a real item row)`);
         continue;
       }
 
@@ -120,12 +124,13 @@ export const POST = auth(async function POST(req) {
         if (price > 0) data.price = price; // a blank/0 price in the sheet shouldn't wipe out a real price already on file
         await prisma.product.update({ where: { id: match.id }, data });
         updated++;
+        if (updatedSample.length < SAMPLE_LIMIT) updatedSample.push(name);
       } else {
         // Unpriced rows are internal stock/hardware in this export, not sellable
         // catalog items — same convention as the CLI Vyapar importer.
         if (price <= 0) {
           skipped++;
-          if (skippedSample.length < 20) skippedSample.push(`${name} (no price)`);
+          if (skippedSample.length < SAMPLE_LIMIT) skippedSample.push(`${name} (no price)`);
           continue;
         }
         const slug = uniqueSlug(slugify(name));
@@ -147,11 +152,20 @@ export const POST = auth(async function POST(req) {
         });
         byName.set(name.toLowerCase(), { id: newProduct.id, name, slug });
         created++;
+        if (createdSample.length < SAMPLE_LIMIT) createdSample.push(name);
       }
     }
 
     revalidateTag("products", { expire: 0 });
-    return NextResponse.json({ totalRows: rows.length, created, updated, skipped, skippedSample });
+    return NextResponse.json({
+      totalRows: rows.length,
+      created,
+      updated,
+      skipped,
+      createdSample,
+      updatedSample,
+      skippedSample,
+    });
   } catch (error: any) {
     console.error("Excel import error:", error);
     return NextResponse.json({ error: "Could not process the uploaded file." }, { status: 500 });

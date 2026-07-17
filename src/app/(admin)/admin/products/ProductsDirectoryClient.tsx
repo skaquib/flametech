@@ -40,8 +40,12 @@ interface ImportResult {
   created: number;
   updated: number;
   skipped: number;
+  createdSample: string[];
+  updatedSample: string[];
   skippedSample: string[];
 }
+
+const BULK_DELETE_CONFIRM_THRESHOLD = 20;
 
 export default function ProductsDirectoryClient({ products, trashedProducts = [] }: { products: Product[]; trashedProducts?: TrashedProduct[] }) {
   const router = useRouter();
@@ -63,6 +67,9 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
+
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [confirmDeleteText, setConfirmDeleteText] = useState("");
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     if (togglingIds.has(id)) return; // already in flight — ignore extra clicks
@@ -128,14 +135,24 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
     });
   };
 
-  const handleBulkDelete = async () => {
+  const requestBulkDelete = () => {
     if (selectedIds.size === 0 || bulkDeleting) return;
-    const ids = Array.from(selectedIds);
+    if (selectedIds.size > BULK_DELETE_CONFIRM_THRESHOLD) {
+      setConfirmDeleteText("");
+      setConfirmDeleteOpen(true);
+      return;
+    }
     const confirmed = window.confirm(
-      `Delete ${ids.length} selected product${ids.length > 1 ? "s" : ""}? They'll move to Recently Deleted and can be restored within 7 days.`
+      `Delete ${selectedIds.size} selected product${selectedIds.size > 1 ? "s" : ""}? They'll move to Recently Deleted and can be restored within 7 days.`
     );
-    if (!confirmed) return;
+    if (confirmed) performBulkDelete();
+  };
 
+  const performBulkDelete = async () => {
+    const ids = Array.from(selectedIds);
+    if (ids.length === 0 || bulkDeleting) return;
+
+    setConfirmDeleteOpen(false);
     setBulkDeleting(true);
     try {
       const res = await fetch("/api/products/bulk-delete", {
@@ -341,27 +358,127 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
         </button>
       </div>
 
-      {importError && (
-        <div className="flex items-start justify-between px-4 py-3 bg-red-950/20 border border-red-900/60 text-red-400 rounded-lg text-xs">
-          <span>{importError}</span>
-          <button onClick={() => setImportError(null)}><X className="w-3.5 h-3.5" /></button>
+      {/* Import result / error modal */}
+      {(importResult || importError) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={() => { setImportResult(null); setImportError(null); }}>
+          <div
+            className="w-full max-w-lg max-h-[80vh] overflow-y-auto bg-white dark:bg-[#0a1128] border border-slate-200 dark:border-brand-slate/40 rounded-xl shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 dark:border-brand-slate/40">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                {importError ? "Import Failed" : "Import Complete"}
+              </h3>
+              <button onClick={() => { setImportResult(null); setImportError(null); }} className="text-slate-400 hover:text-slate-700 dark:hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {importError && (
+                <p className="text-xs text-red-400">{importError}</p>
+              )}
+
+              {importResult && (
+                <>
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="p-3 bg-emerald-950/10 border border-emerald-900/40 rounded-lg">
+                      <p className="text-xl font-black text-emerald-400">{importResult.created}</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Added</p>
+                    </div>
+                    <div className="p-3 bg-brand-teal/10 border border-brand-teal/40 rounded-lg">
+                      <p className="text-xl font-black text-brand-teal">{importResult.updated}</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Updated</p>
+                    </div>
+                    <div className="p-3 bg-slate-100 dark:bg-slate-800/40 border border-slate-300 dark:border-slate-700 rounded-lg">
+                      <p className="text-xl font-black text-slate-500">{importResult.skipped}</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Skipped</p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-slate-500">{importResult.totalRows} rows read from the file.</p>
+
+                  {importResult.createdSample.length > 0 && (
+                    <details className="text-xs" open>
+                      <summary className="font-bold text-emerald-400 cursor-pointer">Added ({importResult.created})</summary>
+                      <ul className="mt-1.5 space-y-0.5 text-slate-600 dark:text-slate-400 max-h-32 overflow-y-auto">
+                        {importResult.createdSample.map((n, i) => <li key={i}>· {n}</li>)}
+                        {importResult.created > importResult.createdSample.length && <li>… and {importResult.created - importResult.createdSample.length} more</li>}
+                      </ul>
+                    </details>
+                  )}
+
+                  {importResult.updatedSample.length > 0 && (
+                    <details className="text-xs">
+                      <summary className="font-bold text-brand-teal cursor-pointer">Updated ({importResult.updated})</summary>
+                      <ul className="mt-1.5 space-y-0.5 text-slate-600 dark:text-slate-400 max-h-32 overflow-y-auto">
+                        {importResult.updatedSample.map((n, i) => <li key={i}>· {n}</li>)}
+                        {importResult.updated > importResult.updatedSample.length && <li>… and {importResult.updated - importResult.updatedSample.length} more</li>}
+                      </ul>
+                    </details>
+                  )}
+
+                  {importResult.skippedSample.length > 0 && (
+                    <details className="text-xs">
+                      <summary className="font-bold text-slate-500 cursor-pointer">Skipped ({importResult.skipped})</summary>
+                      <ul className="mt-1.5 space-y-0.5 text-slate-600 dark:text-slate-400 max-h-32 overflow-y-auto">
+                        {importResult.skippedSample.map((n, i) => <li key={i}>· {n}</li>)}
+                        {importResult.skipped > importResult.skippedSample.length && <li>… and {importResult.skipped - importResult.skippedSample.length} more</li>}
+                      </ul>
+                    </details>
+                  )}
+                </>
+              )}
+
+              <button
+                onClick={() => { setImportResult(null); setImportError(null); }}
+                className="w-full py-2.5 bg-slate-100 dark:bg-brand-slate hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold rounded-lg text-xs"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
-      {importResult && (
-        <div className="flex items-start justify-between px-4 py-3 bg-emerald-950/20 border border-emerald-900/60 text-emerald-400 rounded-lg text-xs">
-          <div>
-            <p className="font-bold">
-              Import complete — {importResult.created} added, {importResult.updated} updated, {importResult.skipped} skipped (of {importResult.totalRows} rows).
+      {/* Large bulk-delete safeguard modal */}
+      {confirmDeleteOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={() => setConfirmDeleteOpen(false)}>
+          <div
+            className="w-full max-w-md bg-white dark:bg-[#0a1128] border border-red-900/60 rounded-xl shadow-2xl p-5 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center space-x-2 text-red-400">
+              <AlertTriangle className="w-5 h-5" />
+              <h3 className="text-sm font-black">Delete {selectedIds.size} products?</h3>
+            </div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              That's a large batch — possibly your whole catalog. They'll move to Recently Deleted and can be restored within 7 days, but to avoid an accidental select-all wipe, type <span className="font-bold text-slate-800 dark:text-white">{selectedIds.size}</span> below to confirm.
             </p>
-            {importResult.skippedSample.length > 0 && (
-              <p className="mt-1 text-emerald-400/70">
-                Skipped (no price, treated as internal stock): {importResult.skippedSample.join(", ")}
-                {importResult.skipped > importResult.skippedSample.length ? "…" : ""}
-              </p>
-            )}
+            <input
+              type="text"
+              inputMode="numeric"
+              value={confirmDeleteText}
+              onChange={(e) => setConfirmDeleteText(e.target.value)}
+              placeholder={`Type ${selectedIds.size} to confirm`}
+              autoFocus
+              className="w-full bg-white dark:bg-[#0a1128]/60 border border-slate-300 dark:border-slate-700 rounded-md py-2 px-3 text-slate-800 dark:text-slate-200 text-sm focus:outline-none focus:border-red-500"
+            />
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setConfirmDeleteOpen(false)}
+                className="flex-1 py-2.5 bg-slate-100 dark:bg-brand-slate hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold rounded-lg text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={performBulkDelete}
+                disabled={confirmDeleteText.trim() !== String(selectedIds.size)}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 disabled:cursor-not-allowed text-white font-bold rounded-lg text-xs"
+              >
+                Delete {selectedIds.size} Products
+              </button>
+            </div>
           </div>
-          <button onClick={() => setImportResult(null)}><X className="w-3.5 h-3.5 shrink-0 ml-3" /></button>
         </div>
       )}
 
@@ -400,6 +517,14 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
         </div>
       </div>
 
+      {/* Result count */}
+      <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+        {filteredList.length > PAGE_SIZE
+          ? `Showing ${(currentPage - 1) * PAGE_SIZE + 1}-${Math.min(currentPage * PAGE_SIZE, filteredList.length)} of ${filteredList.length} products`
+          : `Showing ${filteredList.length} product${filteredList.length === 1 ? "" : "s"}`}
+        {filteredList.length !== list.length ? ` (filtered from ${list.length} total)` : ""}
+      </p>
+
       {/* Bulk action bar */}
       {selectedIds.size > 0 && (
         <div className="flex items-center justify-between px-4 py-2.5 bg-brand-orange/10 border border-brand-orange/30 rounded-lg">
@@ -412,7 +537,7 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
               Clear
             </button>
             <button
-              onClick={handleBulkDelete}
+              onClick={requestBulkDelete}
               disabled={bulkDeleting}
               className="flex items-center space-x-1.5 px-3 py-1.5 bg-red-950/20 border border-red-900/60 text-red-400 hover:bg-red-950/40 rounded-md text-[10px] font-bold disabled:opacity-50"
             >
@@ -563,10 +688,7 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
 
       {/* Pagination */}
       {filteredList.length > PAGE_SIZE && (
-        <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-          <span>
-            Showing {(currentPage - 1) * PAGE_SIZE + 1}-{Math.min(currentPage * PAGE_SIZE, filteredList.length)} of {filteredList.length}
-          </span>
+        <div className="flex items-center justify-end text-xs text-slate-600 dark:text-slate-400">
           <div className="flex gap-2">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
