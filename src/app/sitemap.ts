@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import prisma from "@/lib/prisma";
-
-const SITE_URL = "https://flametechengineering.com";
+import { SITE_URL } from "@/lib/constants";
 
 const fallbackSlugs = [
   "ft-03",

@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthProvider from "@/components/providers/AuthProvider";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { SITE_URL } from "@/lib/constants";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +15,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-const SITE_URL = "https://flametechengineering.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -61,7 +60,7 @@ export const metadata: Metadata = {
 
 const organizationJsonLd = {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": ["Organization", "LocalBusiness"],
   name: "FlameTech Engineering",
   alternateName: "FlameTech",
   url: SITE_URL,

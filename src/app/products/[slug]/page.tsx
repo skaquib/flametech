@@ -6,6 +6,7 @@ import { unstable_cache } from "next/cache";
 import prisma from "@/lib/prisma";
 import { Flame, Settings, ArrowLeft, ShieldAlert, FileText, CheckCircle2 } from "lucide-react";
 import ProductDetailClient from "./ProductDetailClient";
+import { SITE_URL } from "@/lib/constants";
 
 // Revalidate every 2 minutes instead of rendering fresh on every visit — same
 // catalog data doesn't need a DB round-trip for every single product-page view.
@@ -259,8 +260,6 @@ interface PageParams {
   params: Promise<{ slug: string }>;
 }
 
-const SITE_URL = "https://flametechengineering.com";
-
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
@@ -304,7 +303,10 @@ export default async function ProductDetailPage({ params }: PageParams) {
     notFound();
   }
 
-  const productJsonLd = {
+  // Google's Product rich-result requirements treat `offers` without a real
+  // numeric price as invalid — quote-only Equipment has no listed price, so
+  // it's left out entirely rather than emitting a broken `price` field.
+  const productJsonLd: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
@@ -313,16 +315,29 @@ export default async function ProductDetailPage({ params }: PageParams) {
     category: product.category?.name,
     brand: { "@type": "Brand", name: "FlameTech Engineering" },
     image: (product as any).image ? `${SITE_URL}${(product as any).image}` : undefined,
-    offers: {
+  };
+
+  if (product.price) {
+    productJsonLd.offers = {
       "@type": "Offer",
       priceCurrency: "INR",
-      price: product.price ?? undefined,
+      price: product.price,
       availability:
         product.stockQty && product.stockQty > 0
           ? "https://schema.org/InStock"
           : "https://schema.org/PreOrder",
       url: `${SITE_URL}/products/${product.slug}`,
-    },
+    };
+  }
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Products", item: `${SITE_URL}/products` },
+      { "@type": "ListItem", position: 3, name: product.name, item: `${SITE_URL}/products/${product.slug}` },
+    ],
   };
 
   return (
@@ -330,6 +345,10 @@ export default async function ProductDetailPage({ params }: PageParams) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back navigation */}
