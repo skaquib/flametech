@@ -90,6 +90,9 @@ model Product {
   views         ProductView[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?      // soft-delete: set instead of removing the row, so it can be restored within 7 days
+
+  @@index([deletedAt])
 }
 
 model ProductView {

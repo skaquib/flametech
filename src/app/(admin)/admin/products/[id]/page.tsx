@@ -165,7 +165,7 @@ export default function EditProductPage() {
   };
 
   const handleDeleteProduct = async () => {
-    const confirm = window.confirm("Are you sure you want to permanently delete this product from the database?");
+    const confirm = window.confirm("Delete this product? It will move to Recently Deleted and can be restored within 7 days.");
     if (!confirm) return;
 
     setDeleting(true);

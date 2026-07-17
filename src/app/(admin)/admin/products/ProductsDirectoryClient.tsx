@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Search, Flame, Settings, Edit3, Circle, CircleCheck, AlertTriangle } from "lucide-react";
+import { Search, Flame, Settings, Edit3, Circle, CircleCheck, AlertTriangle, Trash2, RotateCcw, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { DEFAULT_PRODUCT_IMAGE } from "@/lib/constants";
 
 interface Product {
@@ -18,14 +18,36 @@ interface Product {
   isActive: boolean;
 }
 
-const PAGE_SIZE = 25;
+interface TrashedProduct {
+  id: string;
+  name: string;
+  itemCode: string | null;
+  type: "EQUIPMENT" | "PART" | "SERVICE";
+  deletedAt: string | Date;
+}
 
-export default function ProductsDirectoryClient({ products }: { products: Product[] }) {
+const PAGE_SIZE = 25;
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+function daysRemaining(deletedAt: string | Date) {
+  const msLeft = new Date(deletedAt).getTime() + SEVEN_DAYS_MS - Date.now();
+  return Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
+}
+
+export default function ProductsDirectoryClient({ products, trashedProducts = [] }: { products: Product[]; trashedProducts?: TrashedProduct[] }) {
   const [list, setList] = useState<Product[]>(products);
+  const [trashList, setTrashList] = useState<TrashedProduct[]>(trashedProducts);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedType, setSelectedType] = useState("all");
   const [page, setPage] = useState(1);
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+
+  const [showTrash, setShowTrash] = useState(false);
+  const [selectedTrashIds, setSelectedTrashIds] = useState<Set<string>>(new Set());
+  const [restoring, setRestoring] = useState(false);
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     if (togglingIds.has(id)) return; // already in flight — ignore extra clicks
@@ -71,9 +93,187 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
   const currentPage = Math.min(page, totalPages);
   const pagedList = filteredList.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
+  const allFilteredSelected = filteredList.length > 0 && filteredList.every((p) => selectedIds.has(p.id));
+
+  const toggleSelectAll = () => {
+    setSelectedIds((prev) => {
+      if (allFilteredSelected) return new Set();
+      const next = new Set(prev);
+      filteredList.forEach((p) => next.add(p.id));
+      return next;
+    });
+  };
+
+  const toggleSelectOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0 || bulkDeleting) return;
+    const ids = Array.from(selectedIds);
+    const confirmed = window.confirm(
+      `Delete ${ids.length} selected product${ids.length > 1 ? "s" : ""}? They'll move to Recently Deleted and can be restored within 7 days.`
+    );
+    if (!confirmed) return;
+
+    setBulkDeleting(true);
+    try {
+      const res = await fetch("/api/products/bulk-delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+
+      if (res.ok) {
+        const deletedNow = new Date().toISOString();
+        const movedItems = list.filter((p) => selectedIds.has(p.id));
+        setList((cur) => cur.filter((p) => !selectedIds.has(p.id)));
+        setTrashList((cur) => [
+          ...movedItems.map((p) => ({ id: p.id, name: p.name, itemCode: p.itemCode, type: p.type, deletedAt: deletedNow })),
+          ...cur,
+        ]);
+        setSelectedIds(new Set());
+      } else {
+        alert("Could not delete the selected products. Please try again.");
+      }
+    } catch {
+      alert("Network connection error.");
+    } finally {
+      setBulkDeleting(false);
+    }
+  };
+
+  const allTrashSelected = trashList.length > 0 && trashList.every((p) => selectedTrashIds.has(p.id));
+
+  const toggleSelectAllTrash = () => {
+    setSelectedTrashIds((prev) => {
+      if (allTrashSelected) return new Set();
+      const next = new Set(prev);
+      trashList.forEach((p) => next.add(p.id));
+      return next;
+    });
+  };
+
+  const toggleSelectOneTrash = (id: string) => {
+    setSelectedTrashIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleRestore = async (ids: string[]) => {
+    if (ids.length === 0 || restoring) return;
+    setRestoring(true);
+    try {
+      const res = await fetch("/api/products/trash", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      });
+
+      if (res.ok) {
+        const restoredSet = new Set(ids);
+        setTrashList((cur) => cur.filter((p) => !restoredSet.has(p.id)));
+        setSelectedTrashIds((cur) => {
+          const next = new Set(cur);
+          ids.forEach((id) => next.delete(id));
+          return next;
+        });
+        // Full product record isn't available client-side after restore, so
+        // refresh the page data to bring it back into the active directory list.
+        window.location.reload();
+      } else {
+        alert("Could not restore the selected products. Please try again.");
+      }
+    } catch {
+      alert("Network connection error.");
+    } finally {
+      setRestoring(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
-      
+
+      {/* Recently Deleted panel */}
+      <div className="rounded-xl border border-slate-200 dark:border-brand-slate/40 bg-white dark:bg-[#0a1128]/20 overflow-hidden">
+        <button
+          onClick={() => setShowTrash((v) => !v)}
+          className="w-full flex items-center justify-between px-5 py-3 text-xs font-bold text-slate-600 dark:text-slate-300"
+        >
+          <span className="flex items-center space-x-2">
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Recently Deleted ({trashList.length})</span>
+          </span>
+          {showTrash ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+
+        {showTrash && (
+          <div className="border-t border-slate-200 dark:border-brand-slate/40 px-5 py-4">
+            {trashList.length === 0 ? (
+              <p className="text-xs text-slate-500 py-2">Nothing in the trash right now.</p>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center space-x-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">
+                    <input type="checkbox" checked={allTrashSelected} onChange={toggleSelectAllTrash} className="w-3.5 h-3.5 accent-brand-orange" />
+                    <span>Select All</span>
+                  </label>
+                  {selectedTrashIds.size > 0 && (
+                    <button
+                      onClick={() => handleRestore(Array.from(selectedTrashIds))}
+                      disabled={restoring}
+                      className="flex items-center space-x-1.5 px-3 py-1.5 bg-brand-teal/15 border border-brand-teal/40 text-brand-teal rounded-md text-[10px] font-bold disabled:opacity-50"
+                    >
+                      {restoring ? <Loader2 className="w-3 h-3 animate-spin" /> : <RotateCcw className="w-3 h-3" />}
+                      <span>Restore Selected ({selectedTrashIds.size})</span>
+                    </button>
+                  )}
+                </div>
+                <ul className="divide-y divide-slate-200 dark:divide-brand-slate/20">
+                  {trashList.map((p) => {
+                    const remaining = daysRemaining(p.deletedAt);
+                    return (
+                      <li key={p.id} className="flex items-center justify-between py-2.5">
+                        <label className="flex items-center space-x-3 flex-1 min-w-0">
+                          <input
+                            type="checkbox"
+                            checked={selectedTrashIds.has(p.id)}
+                            onChange={() => toggleSelectOneTrash(p.id)}
+                            className="w-3.5 h-3.5 accent-brand-orange shrink-0"
+                          />
+                          <span className="min-w-0">
+                            <span className="block font-bold text-slate-800 dark:text-slate-200 text-xs truncate">{p.name}</span>
+                            <span className="block text-[10px] text-slate-500 mt-0.5">
+                              {p.itemCode || "N/A"} · {remaining > 0 ? `${remaining} day${remaining === 1 ? "" : "s"} left to restore` : "purging soon"}
+                            </span>
+                          </span>
+                        </label>
+                        <button
+                          onClick={() => handleRestore([p.id])}
+                          disabled={restoring}
+                          className="ml-3 shrink-0 flex items-center space-x-1.5 px-2.5 py-1.5 bg-slate-100 dark:bg-brand-slate border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-md text-[10px] font-bold disabled:opacity-50"
+                        >
+                          <RotateCcw className="w-3 h-3" />
+                          <span>Restore</span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Filtering Bar */}
       <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center justify-between">
         <div className="relative max-w-sm flex-1">
@@ -109,6 +309,29 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
         </div>
       </div>
 
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center justify-between px-4 py-2.5 bg-brand-orange/10 border border-brand-orange/30 rounded-lg">
+          <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{selectedIds.size} selected</span>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="px-3 py-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+            >
+              Clear
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              disabled={bulkDeleting}
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-red-950/20 border border-red-900/60 text-red-400 hover:bg-red-950/40 rounded-md text-[10px] font-bold disabled:opacity-50"
+            >
+              {bulkDeleting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+              <span>Delete Selected</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Products Table */}
       {filteredList.length === 0 ? (
         <div className="bg-white dark:bg-[#0a1128]/20 border border-dashed border-slate-300 dark:border-slate-800 rounded-xl p-12 text-center text-slate-500">
@@ -120,6 +343,9 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
           <table className="w-full text-xs text-left">
             <thead className="bg-slate-100 dark:bg-[#0a1128]/80 text-[10px] font-bold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-brand-slate/40 uppercase tracking-wider">
               <tr>
+                <th className="px-4 py-4 w-10">
+                  <input type="checkbox" checked={allFilteredSelected} onChange={toggleSelectAll} className="w-3.5 h-3.5 accent-brand-orange" />
+                </th>
                 <th className="px-6 py-4">Image</th>
                 <th className="px-6 py-4">Item Name / Code</th>
                 <th className="px-6 py-4">Type</th>
@@ -134,7 +360,17 @@ export default function ProductsDirectoryClient({ products }: { products: Produc
                 const isEquipment = p.type === "EQUIPMENT";
 
                 return (
-                  <tr key={p.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/10 transition-colors">
+                  <tr key={p.id} className={`hover:bg-slate-50 dark:hover:bg-slate-900/10 transition-colors ${selectedIds.has(p.id) ? "bg-brand-orange/5" : ""}`}>
+
+                    {/* Row select checkbox */}
+                    <td className="px-4 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(p.id)}
+                        onChange={() => toggleSelectOne(p.id)}
+                        className="w-3.5 h-3.5 accent-brand-orange"
+                      />
+                    </td>
 
                     {/* Thumbnail */}
                     <td className="px-6 py-4">

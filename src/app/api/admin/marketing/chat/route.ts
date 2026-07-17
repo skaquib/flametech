@@ -18,7 +18,7 @@ function slugify(name: string) {
 async function getActiveProducts() {
   try {
     return await prisma.product.findMany({
-      where: { isActive: true },
+      where: { isActive: true, deletedAt: null },
       select: { name: true, slug: true, itemCode: true, shortDesc: true, price: true, type: true },
       orderBy: { name: "asc" },
       take: 100,
@@ -50,11 +50,11 @@ function buildLeadsBlock(leads: Awaited<ReturnType<typeof getLeadsWithFollowUpSt
 }
 
 async function findProductByIdentifier(identifier: string) {
-  const bySlug = await prisma.product.findUnique({ where: { slug: identifier } });
+  const bySlug = await prisma.product.findUnique({ where: { slug: identifier, deletedAt: null } });
   if (bySlug) return { product: bySlug };
 
   const matches = await prisma.product.findMany({
-    where: { name: { contains: identifier, mode: "insensitive" } },
+    where: { name: { contains: identifier, mode: "insensitive" }, deletedAt: null },
   });
   if (matches.length === 1) return { product: matches[0] };
   if (matches.length === 0) return { error: `No product found matching "${identifier}".` };

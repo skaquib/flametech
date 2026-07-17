@@ -7,6 +7,7 @@ import prisma from "@/lib/prisma";
 export async function GET(req: NextRequest) {
   try {
     const products = await prisma.product.findMany({
+      where: { deletedAt: null },
       include: { category: true, specs: true },
     });
     return NextResponse.json(products);

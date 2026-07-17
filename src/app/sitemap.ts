@@ -18,7 +18,7 @@ const fallbackSlugs = [
 
 async function getProductSlugs(): Promise<string[]> {
   try {
-    const products = await prisma.product.findMany({ select: { slug: true } });
+    const products = await prisma.product.findMany({ where: { isActive: true, deletedAt: null }, select: { slug: true } });
     if (products.length > 0) {
       return products.map((p) => p.slug);
     }

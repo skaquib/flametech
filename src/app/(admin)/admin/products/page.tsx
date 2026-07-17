@@ -57,6 +57,7 @@ const fallbackProducts = [
 async function getProducts() {
   try {
     const products = await prisma.product.findMany({
+      where: { deletedAt: null },
       orderBy: { createdAt: "desc" },
     });
     if (products.length === 0) return fallbackProducts;
@@ -67,8 +68,26 @@ async function getProducts() {
   }
 }
 
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+
+async function getTrashedProducts() {
+  try {
+    // Lazy purge: anything past the 7-day undo window is gone for good before we list the rest.
+    const cutoff = new Date(Date.now() - SEVEN_DAYS_MS);
+    await prisma.product.deleteMany({ where: { deletedAt: { lt: cutoff } } });
+
+    return await prisma.product.findMany({
+      where: { deletedAt: { not: null } },
+      orderBy: { deletedAt: "desc" },
+    });
+  } catch (error) {
+    console.error("Trashed products DB fetch error");
+    return [];
+  }
+}
+
 export default async function AdminProductsPage() {
-  const products = await getProducts();
+  const [products, trashedProducts] = await Promise.all([getProducts(), getTrashedProducts()]);
 
   return (
     <div className="space-y-8 text-left">
@@ -88,7 +107,7 @@ export default async function AdminProductsPage() {
       </div>
 
       {/* Directory client wrapper */}
-      <ProductsDirectoryClient products={products as any} />
+      <ProductsDirectoryClient products={products as any} trashedProducts={trashedProducts as any} />
 
     </div>
   );

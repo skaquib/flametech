@@ -12,7 +12,7 @@ export const revalidate = 300;
 const getAmcProductId = unstable_cache(
   async () => {
     try {
-      const product = await prisma.product.findUnique({ where: { slug: "amc-service-contract" } });
+      const product = await prisma.product.findUnique({ where: { slug: "amc-service-contract", deletedAt: null } });
       return product?.id ?? null;
     } catch {
       return null;

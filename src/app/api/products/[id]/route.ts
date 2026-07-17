@@ -106,8 +106,9 @@ export const DELETE = auth(async function DELETE(req, context: any) {
   }
 
   try {
-    const deleted = await prisma.product.delete({
+    const deleted = await prisma.product.update({
       where: { id },
+      data: { deletedAt: new Date() },
     });
     revalidateTag("products", { expire: 0 });
     return NextResponse.json(deleted);

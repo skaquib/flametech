@@ -24,7 +24,7 @@ async function getDashboardData() {
       prisma.quoteRequest.count({ where: { status: "NEW" } }),
       prisma.order.count({ where: { status: { notIn: ["DELIVERED", "CANCELLED"] } } }),
       prisma.order.findMany({ where: { status: "PAID" }, select: { total: true } }),
-      prisma.product.count({ where: { type: "PART", stockQty: { lte: 20 } } }),
+      prisma.product.count({ where: { type: "PART", stockQty: { lte: 20 }, deletedAt: null } }),
       prisma.quoteRequest.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { product: true } }),
       prisma.order.findMany({ take: 5, orderBy: { createdAt: "desc" }, include: { user: true } }),
       prisma.productView.findMany({ take: 8, orderBy: { createdAt: "desc" }, include: { product: true, user: true } }),

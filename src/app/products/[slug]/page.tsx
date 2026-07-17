@@ -235,7 +235,7 @@ const getProductBySlug = unstable_cache(
   async (slug: string) => {
     try {
       const product = await prisma.product.findUnique({
-        where: { slug },
+        where: { slug, deletedAt: null },
         include: {
           category: true,
           specs: true,
