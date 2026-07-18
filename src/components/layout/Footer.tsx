@@ -54,22 +54,22 @@ export default function Footer() {
               </h3>
               <ul className="space-y-3.5 text-sm">
                 <li>
-                  <Link href="/products?category=gas-burners" className="hover:text-brand-orange dark:hover:text-white transition-colors">
+                  <Link href="/products/category/gas-burners" className="hover:text-brand-orange dark:hover:text-white transition-colors">
                     Gas Burners (FT-03 to FT-25)
                   </Link>
                 </li>
                 <li>
-                  <Link href="/products?category=oil-burners" className="hover:text-brand-orange dark:hover:text-white transition-colors">
+                  <Link href="/products/category/oil-burners" className="hover:text-brand-orange dark:hover:text-white transition-colors">
                     Oil Burners
                   </Link>
                 </li>
                 <li>
-                  <Link href="/products?category=control-panels" className="hover:text-brand-orange dark:hover:text-white transition-colors">
+                  <Link href="/products/category/control-panels" className="hover:text-brand-orange dark:hover:text-white transition-colors">
                     Automatic Control Panels
                   </Link>
                 </li>
                 <li>
-                  <Link href="/products?category=spare-parts" className="hover:text-brand-orange dark:hover:text-white transition-colors">
+                  <Link href="/products/category/spare-parts" className="hover:text-brand-orange dark:hover:text-white transition-colors">
                     Burner Spare Parts & Accessories
                   </Link>
                 </li>
@@ -95,6 +95,11 @@ export default function Footer() {
                 <li>
                   <Link href="/contact" className="hover:text-brand-orange dark:hover:text-white transition-colors">
                     Request Combustion Analysis
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="hover:text-brand-orange dark:hover:text-white transition-colors">
+                    FAQs
                   </Link>
                 </li>
                 <li>

@@ -38,12 +38,14 @@ const PAGE_SIZE = 24;
 export default function ProductListClient({
   products,
   categories,
+  initialCategory = "all",
 }: {
   products: Product[];
   categories: Category[];
+  initialCategory?: string;
 }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedType, setSelectedType] = useState("all"); // 'all' | 'EQUIPMENT' | 'PART'
   const [addedItemSlug, setAddedItemSlug] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
