@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Flame, Settings, Edit3, Circle, CircleCheck, AlertTriangle, Trash2, RotateCcw, ChevronDown, ChevronUp, Loader2, FileSpreadsheet, X } from "lucide-react";
+import { Search, Flame, Settings, Edit3, Circle, CircleCheck, AlertTriangle, Trash2, RotateCcw, ChevronDown, ChevronUp, Loader2, FileSpreadsheet, X, Download } from "lucide-react";
 import { DEFAULT_PRODUCT_IMAGE } from "@/lib/constants";
 
 interface Product {
@@ -67,6 +67,7 @@ interface ImportProgress {
   current: number;
   total: number;
   log: ImportLogEntry[];
+  matchedColumns?: Record<string, string | undefined>;
 }
 
 const BULK_DELETE_CONFIRM_THRESHOLD = 20;
@@ -299,7 +300,7 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
           const msg = JSON.parse(line);
 
           if (msg.type === "start") {
-            setImportProgress({ current: 0, total: msg.total, log: [] });
+            setImportProgress({ current: 0, total: msg.total, log: [], matchedColumns: msg.matchedColumns });
           } else if (msg.type === "row") {
             setImportProgress((prev) => ({
               current: msg.index,
@@ -408,7 +409,7 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
         onChange={handleFileSelected}
         className="hidden"
       />
-      <div className="flex items-center justify-between">
+      <div className="flex items-center flex-wrap gap-3">
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={importing}
@@ -417,6 +418,13 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
           {importing ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
           <span>{importing ? "Importing..." : "Upload Excel (Vyapar export)"}</span>
         </button>
+        <a
+          href="/api/products/import-excel/template"
+          className="flex items-center space-x-2 px-4 py-2.5 bg-slate-100 dark:bg-brand-dark/40 hover:bg-slate-200 dark:hover:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-lg text-xs transition-all"
+        >
+          <Download className="w-4 h-4" />
+          <span>Download Excel Format</span>
+        </a>
       </div>
 
       {/* Live import progress modal — shows while the stream is still running */}
@@ -434,6 +442,18 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
               <p className="text-[10px] text-slate-500 font-mono">
                 {importProgress.current} / {importProgress.total || "?"} rows processed
               </p>
+              {importProgress.matchedColumns && (
+                <details className="text-[10px] text-slate-400">
+                  <summary className="cursor-pointer hover:text-slate-600 dark:hover:text-slate-300">Column matching (click to verify)</summary>
+                  <ul className="mt-1 space-y-0.5 pl-2">
+                    {Object.entries(importProgress.matchedColumns).map(([field, actual]) => (
+                      <li key={field} className={actual ? "" : "text-red-500 font-bold"}>
+                        {field} → {actual ? `"${actual}"` : "not found in this file"}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-1.5">

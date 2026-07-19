@@ -15,15 +15,49 @@ function slugify(name: string): string {
     .substring(0, 80);
 }
 
-interface ExcelRow {
-  "Item Code"?: string | number;
-  "Item Name"?: string;
-  HSN?: string | number;
-  "Sale Price"?: number;
-  "Online Store Price"?: number;
-  "Current Stock Quantity"?: number;
-  "Minimum Stock Quantity"?: number;
-  "Tax Rate"?: string;
+// Column headers vary between Vyapar export versions/settings (e.g. "Item Name" vs
+// "Item name*", "Sale Price" vs "Sale price") — matching on the exact string was the
+// root cause of every row silently reading as blank and getting skipped. Instead,
+// resolve each logical field to whatever the file's real header turns out to be,
+// normalizing case/asterisks/whitespace and trying a few common alias spellings.
+function normalizeHeader(h: string): string {
+  return h
+    .toLowerCase()
+    .replace(/[*_]/g, "")
+    .replace(/[()]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const FIELD_ALIASES: Record<string, string[]> = {
+  itemName: ["item name", "name", "item"],
+  itemCode: ["item code", "code", "sku", "item sku"],
+  hsn: ["hsn", "hsn code", "hsn/sac"],
+  salePrice: ["sale price", "price", "selling price"],
+  onlineStorePrice: ["online store price", "online price", "web price"],
+  currentStock: ["current stock quantity", "current stock", "stock quantity", "stock", "closing stock", "closing stock quantity"],
+  minStock: ["minimum stock quantity", "min stock quantity", "minimum stock", "min stock"],
+  taxRate: ["tax rate", "gst rate", "gst"],
+};
+
+function resolveColumns(headerKeys: string[]): Record<keyof typeof FIELD_ALIASES, string | undefined> {
+  const normalizedToActual = new Map<string, string>();
+  for (const key of headerKeys) {
+    if (!normalizedToActual.has(normalizeHeader(key))) normalizedToActual.set(normalizeHeader(key), key);
+  }
+
+  const resolved = {} as Record<keyof typeof FIELD_ALIASES, string | undefined>;
+  for (const field of Object.keys(FIELD_ALIASES) as (keyof typeof FIELD_ALIASES)[]) {
+    resolved[field] = undefined;
+    for (const alias of FIELD_ALIASES[field]) {
+      const actual = normalizedToActual.get(alias);
+      if (actual !== undefined) {
+        resolved[field] = actual;
+        break;
+      }
+    }
+  }
+  return resolved;
 }
 
 // POST /api/products/import-excel (Admin only) — bulk add/update products from a
@@ -65,10 +99,22 @@ export const POST = auth(async function POST(req) {
   }
 
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  const rows = XLSX.utils.sheet_to_json<ExcelRow>(sheet, { defval: "" });
+  const rows = XLSX.utils.sheet_to_json<Record<string, any>>(sheet, { defval: "" });
 
   if (rows.length === 0) {
     return Response.json({ error: "The file has no rows to import." }, { status: 400 });
+  }
+
+  const headerKeys = Object.keys(rows[0]);
+  const columns = resolveColumns(headerKeys);
+
+  if (!columns.itemName) {
+    return Response.json(
+      {
+        error: `Could not find an item name column in this file. Found columns: ${headerKeys.join(", ")}. Expected something like "Item Name".`,
+      },
+      { status: 400 }
+    );
   }
 
   const encoder = new TextEncoder();
@@ -115,11 +161,11 @@ export const POST = auth(async function POST(req) {
         const failedSample: string[] = [];
         const SAMPLE_LIMIT = 50;
 
-        send({ type: "start", total: rows.length });
+        send({ type: "start", total: rows.length, matchedColumns: columns });
 
         for (let i = 0; i < rows.length; i++) {
           const row = rows[i];
-          const name = String(row["Item Name"] ?? "").trim();
+          const name = String(row[columns.itemName!] ?? "").trim();
           const nameKey = name.toLowerCase();
 
           try {
@@ -145,14 +191,14 @@ export const POST = auth(async function POST(req) {
             }
             seenInThisFile.add(nameKey);
 
-            const salePrice = Number(row["Sale Price"]) || 0;
-            const onlinePrice = Number(row["Online Store Price"]) || 0;
+            const salePrice = columns.salePrice ? Number(row[columns.salePrice]) || 0 : 0;
+            const onlinePrice = columns.onlineStorePrice ? Number(row[columns.onlineStorePrice]) || 0 : 0;
             const price = onlinePrice > 0 ? onlinePrice : salePrice;
-            const stockQty = Math.max(0, Math.round(Number(row["Current Stock Quantity"]) || 0));
-            const minStockQty = Math.max(0, Math.round(Number(row["Minimum Stock Quantity"]) || 0));
-            const itemCode = String(row["Item Code"] ?? "").trim() || null;
-            const hsn = String(row["HSN"] ?? "").trim() || null;
-            const taxRate = String(row["Tax Rate"] ?? "").trim() || null;
+            const stockQty = columns.currentStock ? Math.max(0, Math.round(Number(row[columns.currentStock]) || 0)) : 0;
+            const minStockQty = columns.minStock ? Math.max(0, Math.round(Number(row[columns.minStock]) || 0)) : 0;
+            const itemCode = columns.itemCode ? String(row[columns.itemCode] ?? "").trim() || null : null;
+            const hsn = columns.hsn ? String(row[columns.hsn] ?? "").trim() || null : null;
+            const taxRate = columns.taxRate ? String(row[columns.taxRate] ?? "").trim() || null : null;
 
             const match = byName.get(nameKey);
 

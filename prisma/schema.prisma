@@ -190,6 +190,18 @@ model QuoteRequest {
   notes       String?     @db.Text
   lastContactedAt DateTime?
   createdAt   DateTime    @default(now())
+  activities  QuoteActivity[]
+}
+
+model QuoteActivity {
+  id             String       @id @default(cuid())
+  quoteRequestId String
+  quoteRequest   QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+  type           String       // "reminder_sent" | "called" | "note"
+  note           String?
+  createdAt      DateTime     @default(now())
+
+  @@index([quoteRequestId])
 }
 
 model AMCContract {
