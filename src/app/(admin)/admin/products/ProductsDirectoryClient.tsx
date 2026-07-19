@@ -39,10 +39,34 @@ interface ImportResult {
   totalRows: number;
   created: number;
   updated: number;
+  duplicates: number;
   skipped: number;
+  failed: number;
   createdSample: string[];
   updatedSample: string[];
+  duplicateSample: string[];
   skippedSample: string[];
+  failedSample: string[];
+}
+
+interface ImportLogEntry {
+  name: string;
+  action: "created" | "updated" | "duplicate" | "skipped" | "failed";
+  reason?: string;
+}
+
+const IMPORT_ACTION_BADGE: Record<ImportLogEntry["action"], string> = {
+  created: "bg-emerald-950/10 text-emerald-500 border border-emerald-900/40",
+  updated: "bg-brand-teal/10 text-brand-teal border border-brand-teal/40",
+  duplicate: "bg-amber-950/10 text-amber-500 border border-amber-900/40",
+  skipped: "bg-slate-100 dark:bg-slate-800/40 text-slate-500 border border-slate-300 dark:border-slate-700",
+  failed: "bg-red-950/10 text-red-500 border border-red-900/40",
+};
+
+interface ImportProgress {
+  current: number;
+  total: number;
+  log: ImportLogEntry[];
 }
 
 const BULK_DELETE_CONFIRM_THRESHOLD = 20;
@@ -67,6 +91,7 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
+  const [importProgress, setImportProgress] = useState<ImportProgress | null>(null);
 
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [confirmDeleteText, setConfirmDeleteText] = useState("");
@@ -239,6 +264,7 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
     setImporting(true);
     setImportError(null);
     setImportResult(null);
+    setImportProgress({ current: 0, total: 0, log: [] });
 
     try {
       const formData = new FormData();
@@ -249,16 +275,51 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
         body: formData,
       });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        setImportResult(data);
-        router.refresh();
-      } else {
+      if (!res.ok || !res.body) {
+        const data = await res.json().catch(() => ({}));
         setImportError(data.error || "Could not import this file.");
+        setImportProgress(null);
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || ""; // last (possibly partial) line stays buffered until it's complete
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const msg = JSON.parse(line);
+
+          if (msg.type === "start") {
+            setImportProgress({ current: 0, total: msg.total, log: [] });
+          } else if (msg.type === "row") {
+            setImportProgress((prev) => ({
+              current: msg.index,
+              total: msg.total,
+              log: [{ name: msg.name, action: msg.action, reason: msg.reason }, ...(prev?.log ?? [])].slice(0, 200),
+            }));
+          } else if (msg.type === "done") {
+            const { type, ...result } = msg;
+            setImportResult(result);
+            setImportProgress(null);
+            router.refresh();
+          } else if (msg.type === "error") {
+            setImportError(msg.error);
+            setImportProgress(null);
+          }
+        }
       }
     } catch {
       setImportError("Network connection error.");
+      setImportProgress(null);
     } finally {
       setImporting(false);
     }
@@ -358,6 +419,43 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
         </button>
       </div>
 
+      {/* Live import progress modal — shows while the stream is still running */}
+      {importProgress && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-lg max-h-[80vh] flex flex-col bg-white dark:bg-[#0a1128] border border-slate-200 dark:border-brand-slate/40 rounded-xl shadow-2xl">
+            <div className="px-5 py-4 border-b border-slate-200 dark:border-brand-slate/40 space-y-2">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white">Importing products...</h3>
+              <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-brand-orange h-2 rounded-full transition-all duration-200"
+                  style={{ width: importProgress.total > 0 ? `${(importProgress.current / importProgress.total) * 100}%` : "0%" }}
+                />
+              </div>
+              <p className="text-[10px] text-slate-500 font-mono">
+                {importProgress.current} / {importProgress.total || "?"} rows processed
+              </p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5 space-y-1.5">
+              {importProgress.log.length === 0 && (
+                <p className="text-xs text-slate-400 italic">Reading file...</p>
+              )}
+              {importProgress.log.map((entry, i) => (
+                <div key={i} className="flex items-center justify-between gap-2 text-xs">
+                  <span className="text-slate-700 dark:text-slate-300 truncate" title={entry.reason}>{entry.name}</span>
+                  <span
+                    className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${IMPORT_ACTION_BADGE[entry.action]}`}
+                    title={entry.reason}
+                  >
+                    {entry.action}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Import result / error modal */}
       {(importResult || importError) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={() => { setImportResult(null); setImportError(null); }}>
@@ -381,7 +479,7 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
 
               {importResult && (
                 <>
-                  <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
                     <div className="p-3 bg-emerald-950/10 border border-emerald-900/40 rounded-lg">
                       <p className="text-xl font-black text-emerald-400">{importResult.created}</p>
                       <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Added</p>
@@ -390,12 +488,26 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
                       <p className="text-xl font-black text-brand-teal">{importResult.updated}</p>
                       <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Updated</p>
                     </div>
+                    <div className="p-3 bg-amber-950/10 border border-amber-900/40 rounded-lg">
+                      <p className="text-xl font-black text-amber-500">{importResult.duplicates}</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Duplicates</p>
+                    </div>
                     <div className="p-3 bg-slate-100 dark:bg-slate-800/40 border border-slate-300 dark:border-slate-700 rounded-lg">
                       <p className="text-xl font-black text-slate-500">{importResult.skipped}</p>
                       <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Skipped</p>
                     </div>
                   </div>
                   <p className="text-[10px] text-slate-500">{importResult.totalRows} rows read from the file.</p>
+
+                  {importResult.failed > 0 && (
+                    <div className="p-3 bg-red-950/10 border border-red-900/40 rounded-lg space-y-1">
+                      <p className="text-xs font-bold text-red-500">{importResult.failed} row{importResult.failed === 1 ? "" : "s"} failed with an error — these were NOT imported</p>
+                      <ul className="space-y-0.5 text-[11px] text-red-400/90 max-h-32 overflow-y-auto">
+                        {importResult.failedSample.map((n, i) => <li key={i}>· {n}</li>)}
+                        {importResult.failed > importResult.failedSample.length && <li>… and {importResult.failed - importResult.failedSample.length} more</li>}
+                      </ul>
+                    </div>
+                  )}
 
                   {importResult.createdSample.length > 0 && (
                     <details className="text-xs" open>
@@ -413,6 +525,16 @@ export default function ProductsDirectoryClient({ products, trashedProducts = []
                       <ul className="mt-1.5 space-y-0.5 text-slate-600 dark:text-slate-400 max-h-32 overflow-y-auto">
                         {importResult.updatedSample.map((n, i) => <li key={i}>· {n}</li>)}
                         {importResult.updated > importResult.updatedSample.length && <li>… and {importResult.updated - importResult.updatedSample.length} more</li>}
+                      </ul>
+                    </details>
+                  )}
+
+                  {importResult.duplicateSample.length > 0 && (
+                    <details className="text-xs">
+                      <summary className="font-bold text-amber-500 cursor-pointer">Duplicates ({importResult.duplicates})</summary>
+                      <ul className="mt-1.5 space-y-0.5 text-slate-600 dark:text-slate-400 max-h-32 overflow-y-auto">
+                        {importResult.duplicateSample.map((n, i) => <li key={i}>· {n}</li>)}
+                        {importResult.duplicates > importResult.duplicateSample.length && <li>… and {importResult.duplicates - importResult.duplicateSample.length} more</li>}
                       </ul>
                     </details>
                   )}
